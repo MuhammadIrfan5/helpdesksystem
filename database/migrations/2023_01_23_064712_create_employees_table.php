@@ -14,12 +14,22 @@ return new class extends Migration
     public function up()
     {
         Schema::create('employees', function (Blueprint $table) {
-            $table->id();
-            $table->uuid();
-            $table->foreignId('company_id')->constrained('companies');
-            $table->foreignId('branch_id')->constrained('company_branches');
-            $table->foreignId('user_created_by')->constrained('users');
-            $table->foreignId('role_id')->constrained('roles');
+            // $table->id();
+            // $table->uuid();
+            $table->uuid('id')->primary();
+
+            $table->unsignedBigInteger('company_id');
+            $table->foreign('company_id')->references('id')->on('companies');
+            $table->unsignedBigInteger('branch_id');
+            $table->foreign('branch_id')->references('id')->on('company_branches');
+            $table->unsignedBigInteger('user_created_by');
+            $table->foreign('user_created_by')->references('id')->on('users');
+            $table->unsignedBigInteger('country_id');
+            $table->foreign('country_id')->references('id')->on('countries');
+            $table->unsignedBigInteger('city_id');
+            $table->foreign('city_id')->references('id')->on('cities');
+            $table->unsignedBigInteger('role_id');
+            $table->foreign('role_id')->references('id')->on('roles');
             $table->string('employee_code')->unique();
             $table->enum('employee_type',['permanent','probationary','contract']);
             $table->string('first_name');

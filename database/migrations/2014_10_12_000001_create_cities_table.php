@@ -14,9 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('cities', function (Blueprint $table) {
-            $table->id();
-            $table->uuid();
-            $table->foreignId('country_id')->constrained('countries')->onUpdate('cascade')->onDelete('cascade');
+            // $table->id();
+            $table->uuid('id')->primary();
+            $table->unsignedBigInteger('country_id');
+            $table->foreign('country_id')->references('id')->on('countries');
             $table->string('name');
             $table->string('code');
             $table->enum('status', ['active', 'inactive']);

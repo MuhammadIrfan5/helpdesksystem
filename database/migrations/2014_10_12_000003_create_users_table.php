@@ -14,8 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('uid');
+            // $table->id();
+            $table->uuid('id')->primary();
+            // $table->uuid('uid');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('phone')->unique();
@@ -24,12 +25,12 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('salt_key');
-            $table->foreignId('role_id')->constrained('roles')->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreignId('country_id')->constrained('countries')->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreignId('city_id')->constrained('cities')->onUpdate('cascade')
-                ->onDelete('cascade');
+            $table->unsignedBigInteger('role_id');
+            $table->foreign('role_id')->references('id')->on('roles');
+            $table->unsignedBigInteger('country_id');
+            $table->foreign('country_id')->references('id')->on('countries');
+            $table->unsignedBigInteger('city_id');
+            $table->foreign('city_id')->references('id')->on('cities');
             $table->rememberToken();
             $table->timestamps();
         });

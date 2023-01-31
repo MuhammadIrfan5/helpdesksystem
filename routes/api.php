@@ -16,4 +16,6 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('user/login',[UserController::class,'login']);
 Route::group(['middleware'=>['auth:users']],function() {
+
+    
 });

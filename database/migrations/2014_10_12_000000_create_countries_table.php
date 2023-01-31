@@ -14,12 +14,19 @@ return new class extends Migration
     public function up()
     {
         Schema::create('countries', function (Blueprint $table) {
-            $table->id();
-            $table->uuid();
-            $table->string('name');
+            // $table->id();
+            $table->uuid('id')->primary();
+            // $table->uuid();
+            $table->string('phone');
             $table->string('code');
-            $table->text('image_path');
-            $table->enum('status', ['active', 'inactive']);
+            $table->string('name');
+            $table->text('symbol');
+            $table->text('capital');
+            $table->text('currency');
+            $table->text('continent');
+            $table->text('continent_code');
+            $table->text('alpha_3');
+            $table->enum('status', ['active', 'inactive'])->default("inactive");
             $table->timestamps();
         });
     }

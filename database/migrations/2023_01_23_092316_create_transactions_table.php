@@ -14,10 +14,15 @@ return new class extends Migration
     public function up()
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained('companies');
-            $table->foreignId('branch_id')->constrained('company_branches');
-            $table->foreignId('payment_method_id')->constrained('payment_methods');
+            // $table->id();
+            $table->uuid('id')->primary();
+
+            $table->unsignedBigInteger('company_id');
+            $table->foreign('company_id')->references('id')->on('companies');
+            $table->unsignedBigInteger('branch_id');
+            $table->foreign('branch_id')->references('id')->on('company_branches');
+            $table->unsignedBigInteger('payment_method_id');
+            $table->foreign('payment_method_id')->references('id')->on('payment_methods');
             $table->string('amount');
             $table->string('paid_month');
             $table->date('paid_date');
