@@ -16,13 +16,9 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             // $table->id();
             $table->uuid('id')->primary();
-
-            $table->unsignedBigInteger('company_id');
-            $table->foreign('company_id')->references('id')->on('companies');
-            $table->unsignedBigInteger('branch_id');
-            $table->foreign('branch_id')->references('id')->on('company_branches');
-            $table->unsignedBigInteger('payment_method_id');
-            $table->foreign('payment_method_id')->references('id')->on('payment_methods');
+            $table->foreignUuid('company_id')->references('id')->on('companies');
+            $table->foreignUuid('branch_id')->references('id')->on('company_branches');
+            $table->foreignUuid('payment_method_id')->references('id')->on('payment_methods');
             $table->string('amount');
             $table->string('paid_month');
             $table->date('paid_date');

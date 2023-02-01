@@ -17,12 +17,9 @@ return new class extends Migration
             // $table->id();
             // $table->uuid();
             $table->uuid('id')->primary();
-            $table->unsignedBigInteger('user_created_by');
-            $table->foreign('user_created_by')->references('id')->on('users');
-            $table->unsignedBigInteger('country_id');
-            $table->foreign('country_id')->references('id')->on('countries');
-            $table->unsignedBigInteger('city_id');
-            $table->foreign('city_id')->references('id')->on('cities');
+            $table->foreignUuid('user_created_by')->references('id')->on('users');
+            $table->foreignUuid('country_id')->references('id')->on('countries');
+            $table->foreignUuid('city_id')->references('id')->on('cities');
             $table->string('registration_no')->unique();
             $table->string('name');
             $table->string('email')->unique();

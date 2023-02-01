@@ -25,12 +25,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('salt_key');
-            $table->unsignedBigInteger('role_id');
-            $table->foreign('role_id')->references('id')->on('roles');
-            $table->unsignedBigInteger('country_id');
-            $table->foreign('country_id')->references('id')->on('countries');
-            $table->unsignedBigInteger('city_id');
-            $table->foreign('city_id')->references('id')->on('cities');
+            $table->foreignUuid('role_id')->references('id')->on('roles');
+            $table->foreignUuid('country_id')->references('id')->on('countries');
+            $table->foreignUuid('city_id')->references('id')->on('cities');
             $table->rememberToken();
             $table->timestamps();
         });
