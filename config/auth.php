@@ -45,6 +45,14 @@ return [
             'driver' => 'sanctum',
             'provider' => 'users',
         ],
+        'company' => [
+            'driver' => 'sanctum',
+            'provider' => 'company',
+        ],
+        'engineer' => [
+            'driver' => 'sanctum',
+            'provider' => 'engineer',
+        ],
     ],
 
     /*
@@ -69,7 +77,14 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-
+        'company' => [
+            'driver' => 'sanctum',
+            'model' => App\Models\Company::class,
+        ],
+        'engineer' => [
+            'driver' => 'sanctum',
+            'model' => App\Models\Engineer::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
