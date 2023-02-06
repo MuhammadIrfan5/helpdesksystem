@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+use Psy\Util\Str;
 
 class UserController extends Controller
 {
@@ -85,48 +87,55 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        /*Response format*/
-        $response = [
-            "success" => false,
-            "message" => ""
-        ];
-        /*validation rules*/
         $validationRules = [
-            'phone' => 'required|string',
+            'email' => 'required|string',
             'password' => 'required|string',
         ];
-        /*apply validation*/
         $validator = Validator::make($request->all(), $validationRules);
-        /*check is validation success*/
         if ($validator->fails()) {
-            $response["message"] = $validator->errors()->first();
+            return response()->json(
+                [
+                    'status' => 'Validation Errors' ,
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constants.codes.Forbidden'),
+                    'data' => [],
+                ]);
+
         } else {
-            /*Authenticate user*/
-            $rsp = User::where('phone', $request['phone'])->first();
-            if (!$rsp || !Hash::check($request["password"], $rsp->password)) {
-                $response["message"] = "Invalid Login Credentials!";
-                return response($response, 201);
+            $user = User::where('email', $request['email'])->first();
+            if (!empty($user) && ( $user->role->slug === 'admin' || $user->role->slug === 'superadmin')) {
+                if (!$user || !Hash::check($request["password"], $user->password)) {
+                    return response()->json(
+                        [
+                            'status' => config('constant.messages.Unauthorized'),
+                            'message' => 'Invalid Credentials',
+                            'code' => config('constant.codes.Unauthorized'),
+                            'data' => [],
+                        ]);
+                }else {
+                    $user->tokens()->delete();
+                    $token = $user->createToken('userToken')->plainTextToken;
+                    $user->remember_token = $token;
+                    $user->save();
+                    $user->usertoken = $token;
+                   return response()->json(
+                        [
+                            'status' => config('constant.messages.loginSuccess'),
+                            'message' => 'Logged In',
+                            'code' => config('constant.codes.success'),
+                            'data' => $user,
+                        ]);
+                }
+            }else {
+                return response()->json(
+                [
+                    'status' => config('constant.messages.Unauthorized'),
+                    'message' => 'Invalid Role',
+                    'code' => config('constant.codes.Unauthorized'),
+                    'data' => [],
+                ]);
             }
-            /*create user token*/
-            $token = $rsp->createToken('userapptoken')->plainTextToken;
-            $rsp->remember_token=$token;
-            $rsp->save();
-            /*make response*/
-            $response["id"] = $rsp["id"];
-            $response["name"] = $rsp["first_name"] . " " . $rsp["last_name"];
-            $response["image"] = $rsp["image"]??'';
-            $response["phone"] = $rsp["phone"];
-            $response["address"] = $rsp["address"];
-            $response["country"] = $rsp["country_id"];
-            $response["city"] = $rsp["city_id"];
-            $response["email"] = $rsp["email"];
-            $response["role"] = $rsp["role_id"];
-            $response["token"] = $token;
-            $response["channel"] = "user-" . $rsp["id"];
-            $response["success"] = true;
-            $response["message"] = "User Successfully Logged In!";
         }
-        return response($response, 201);
     }
 
     public function imageUpload($query) // Taking input image as parameter
