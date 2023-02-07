@@ -9,4 +9,12 @@ class Country extends Model
 {
     use HasFactory;
 
+    protected $hidden = [
+        'id'
+    ];
+
+    public function city(){
+        return $this->hasMany(City::class);
+    }
+
 }

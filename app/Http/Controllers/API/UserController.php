@@ -102,7 +102,7 @@ class UserController extends Controller
                 ]);
 
         } else {
-            $user = User::where('email', $request['email'])->first();
+            $user = User::Where('email', $request['email'])->first();
             if (!empty($user) && ( $user->role->slug === 'admin' || $user->role->slug === 'super-admin')) {
                 if (!$user || !Hash::check($request["password"], $user->password)) {
                     return response()->json(

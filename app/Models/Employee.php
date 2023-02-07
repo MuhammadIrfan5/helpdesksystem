@@ -27,6 +27,50 @@ class Employee extends Authenticatable
         'password'
     ];
     protected $hidden = [
-        'password'
+        'password',
+        'id',
+        'country_id',
+        'city_id',
+        'branch_id',
+        'role_id',
+        'company_id',
+        'employee_type_id'
     ];
+
+    protected $with = [
+        'role:id,uuid,slug',
+        'country:id,uuid,name,code',
+        'city:id,uuid,name,code,country_id',
+        'company:id,uuid,name,email,package_id,country_id,city_id,role_id,user_created_by',
+        'employee_type:id,uuid,type'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function role(){
+        return $this->belongsTo(Role::class,'role_id','id');//->select('uuid','slug');
+    }
+
+    public function country(){
+        return $this->belongsTo(Country::class);
+    }
+
+    public function city(){
+        return $this->belongsTo(City::class);
+    }
+
+    public function company(){
+        return $this->belongsTo(Company::class,'company_id','id');
+    }
+
+    public function employee_type(){
+        return $this->belongsTo(EmployeeType::class);
+    }
 }

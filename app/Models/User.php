@@ -32,9 +32,17 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
+        'id',
         'password',
         'remember_token',
-        'salt_key'
+        'salt_key',
+        'email_verified_at'
+    ];
+
+    protected $with = [
+        'role:id,uuid,slug',
+        'country:id,uuid,name,code',
+        'city:id,uuid,name,code,country_id'
     ];
 
     /**
@@ -46,8 +54,15 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class,'role_id','id');
+    public function role(){
+        return $this->belongsTo(Role::class,'role_id','id');//->select('uuid','slug');
+    }
+
+    public function country(){
+        return $this->belongsTo(Country::class,'country_id','id');//->select('id','uuid','name','code');
+    }
+
+    public function city(){
+        return $this->belongsTo(City::class);
     }
 }

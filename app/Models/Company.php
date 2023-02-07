@@ -40,6 +40,48 @@ class Company extends Authenticatable
     ];
 
     protected $hidden = [
-        'password'
+        'password',
+        'id',
+        'country_id',
+        'city_id',
+        'package_id',
+        'role_id',
     ];
+
+    protected $with = [
+        'role:id,uuid,slug',
+        'country:id,uuid,name,code',
+        'city:id,uuid,name,code,country_id',
+        'package:id,uuid,name,package_cost',
+        'created_by:id,uuid,first_name,last_name,email,role_id,city_id,country_id'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function role(){
+        return $this->belongsTo(Role::class,'role_id','id');//->select('uuid','slug');
+    }
+
+    public function country(){
+        return $this->belongsTo(Country::class);
+    }
+
+    public function city(){
+        return $this->belongsTo(City::class);
+    }
+
+    public function package(){
+        return $this->belongsTo(Package::class);
+    }
+
+    public function created_by(){
+        return $this->belongsTo(User::class,'user_created_by','id');
+    }
 }
