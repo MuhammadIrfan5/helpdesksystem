@@ -39,16 +39,16 @@ class CityController extends Controller
             'country_id' => 'required',
             'code' => 'required|min:2',
             'status' => 'required',
-        ];
+        ]);
             $user = User::create([
                 'uuid' => Str::uuid,
                 'country_id' => $request->country_id,
                 'code' => $request->code,
                 'status' => $request->status,
             ]);
-      
+
             $token = $user->createToken('Laravel9PassportAuth')->accessToken;
-      
+
             return response()->json(['token' => $token], 200);
     }
 

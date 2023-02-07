@@ -14,14 +14,13 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('login',[UserController::class,'login'])->name('login');//->middleware('adminSuperAdmin');
-//Route::group(['middleware'=>['auth:users']],function() {
-//});
+Route::post('login',[UserController::class,'login'])->name('login');
+Route::post('company_login',[\App\Http\Controllers\Company\CompanyController::class,'login'])->name('company_login');
 
-//Route::middleware(['auth:sanctum'])->group(function () {
-//    Route::post('company_login',[\App\Http\Controllers\Company\CompanyController::class,'store'])->name('company_login');
-//});
-
-Route::prefix('Company')->namespace('company')->middleware(['auth:sanctum'])->group(function () {
+Route::prefix('Company')->namespace('company')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('company_create',[\App\Http\Controllers\Company\CompanyController::class,'store'])->name('company_create');
+});
+
+Route::prefix('Employee')->namespace('employee')->middleware(['auth:sanctum','company'])->group(function () {
+    Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create');
 });

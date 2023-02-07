@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class SuperAdminMiddleware
+class CompanyMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,10 +15,20 @@ class SuperAdminMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next,...$role)
+    public function handle(Request $request, Closure $next)
     {
-        if ($request->hasHeader( 'Authorization' ) && Auth::guard('users')->check() && (Auth::user()->role->slug == $role[0] || Auth::user()->role->slug == $role[1]) ) {
-            return $next($request);
+        if($request->header('Authorization') && Auth::guard('company')->check() && get_role_data_by_id(auth()->user()->role_id)['slug'] == 'company'){
+            if(auth()->user()->is_approved == 1) {
+                return $next($request);
+            }else{
+                return response()->json(
+                    [
+                        'status' => config('constant.messages.Unauthorized'),
+                        'message' => 'Account Not Active',
+                        'code' => config('constant.codes.Unauthorized'),
+                        'data' => [],
+                    ]);
+            }
         }else {
             return response()->json(
                 [

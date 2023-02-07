@@ -13,13 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('roles', function (Blueprint $table) {
-             $table->id();
-            $table->uuid('uuid');
-            $table->string('name');
-            $table->string('slug');
-            $table->enum('status',['active','inactive']);
-            $table->timestamps();
+        Schema::table('companies', function (Blueprint $table) {
+            $table->foreignId('role_id')->after('package_id')->constrained('roles')->onUpdate('cascade')
+                ->onDelete('cascade');
         });
     }
 
@@ -30,6 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('roles');
+        Schema::table('companies', function (Blueprint $table) {
+            //
+        });
     }
 };

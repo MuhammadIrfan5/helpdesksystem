@@ -78,11 +78,11 @@ return [
             'model' => App\Models\User::class,
         ],
         'company' => [
-            'driver' => 'sanctum',
+            'driver' => 'eloquent',
             'model' => App\Models\Company::class,
         ],
         'engineer' => [
-            'driver' => 'sanctum',
+            'driver' => 'eloquent',
             'model' => App\Models\Engineer::class,
         ],
         // 'users' => [

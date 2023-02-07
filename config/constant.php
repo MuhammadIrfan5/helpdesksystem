@@ -6,7 +6,7 @@
             'found' => '302',
             'badRequest' => '400',
             'Unauthorized' => '401',
-            'Forbidden' => '403',
+            'validation' => '403',
             'notFound' => '401',
         ],
         'messages' => [
@@ -15,7 +15,8 @@
             'Invalidcreds' => 'Invalid Credentials',
             'InvalidRole' => 'Invalid Role',
             'Unauthorized' => 'User Unauthorized',
-            'Success' => 'Success'
+            'Success' => 'Success',
+            'Failure' => 'Failure',
         ]
 
     ];

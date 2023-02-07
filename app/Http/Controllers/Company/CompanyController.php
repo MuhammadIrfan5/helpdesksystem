@@ -7,7 +7,9 @@ use App\Models\Company;
 use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
@@ -31,6 +33,57 @@ class CompanyController extends Controller
         //
     }
 
+    public function login(Request $request){
+        $validationRules = [
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'status' => 'Validation Errors' ,
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constants.codes.validation'),
+                    'data' => [],
+                ]);
+
+        } else {
+            $company = Company::where('email', $request['email'])->first();
+            if (!empty($company)) {
+                if (!Hash::check($request["password"], $company->password)) {
+                    return response()->json(
+                        [
+                            'status' => config('constant.messages.Unauthorized'),
+                            'message' => 'Invalid Credentials',
+                            'code' => config('constant.codes.Unauthorized'),
+                            'data' => [],
+                        ]);
+                }else {
+                    $company->tokens()->delete();
+                    $token = $company->createToken('companyToken')->plainTextToken;
+                    $company->save();
+                    $company->companyToken = $token;
+                    return response()->json(
+                        [
+                            'status' => config('constant.messages.loginSuccess'),
+                            'message' => 'Logged In',
+                            'code' => config('constant.codes.success'),
+                            'data' => $company,
+                        ]);
+                }
+            }else {
+                return response()->json(
+                    [
+                        'status' => config('constant.messages.Unauthorized'),
+                        'message' => 'Invalid Role',
+                        'code' => config('constant.codes.Unauthorized'),
+                        'data' => [],
+                    ]);
+            }
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -44,7 +97,6 @@ class CompanyController extends Controller
             'country_id' => 'required|string',
             'city_id' => 'required|string',
             'package_id' => 'required|string',
-            'registration_no' => 'required|string|unique:companies,registration_no',
             'name' => 'required|string|min:3',
             'email' => 'required|email|unique:companies,email',
             'phone_no' => 'required|string|min:11|max:12',
@@ -52,7 +104,8 @@ class CompanyController extends Controller
             'longitude' => 'required|string',
             'is_approved' => 'required',
             'address' => 'required',
-            'password' => 'required|string|min:8',
+            'engineer_limit' => 'required',
+            'employee_limit' => 'required',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -60,42 +113,45 @@ class CompanyController extends Controller
                 [
                     'status' => 'Validation Errors' ,
                     'message' => $validator->errors()->first(),
-                    'code' => config('constants.codes.Forbidden'),
+                    'code' => config('constants.codes.validation'),
                     'data' => [],
                 ]);
         } else {
-            if((checkAdminAndSupAdmin("admin") || checkAdminAndSupAdmin('superadmin')) && $request->header('Authorization') ){
-
-                $data = [
-//                    $request->user_created_by
-                    'user_created_by' => auth()->user()->id,
-                    'country_id' => $request->country_id,
-                    'city_id' => $request->city_id,
-                    'package_id' => $request->package_id,
-                    'registration_no' => $request->registration_no,
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'phone_no' => $request->phone_no,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'is_approved' => $request->is_approved,
-                    'address' => $request->address,
-                    'password' => $request->password,
-                ];
-                $company = Company::create($data);
+        $data = [
+                'uuid' => Str::uuid(),
+                'user_created_by' => auth()->user()->id,
+                'country_id' => $request->country_id,
+                'city_id' => $request->city_id,
+                'package_id' => $request->package_id,
+                'role_id' => 3,
+                'registration_no' => generate_registaion_no(),
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_no' => $request->phone_no,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'is_approved' => $request->is_approved,
+                'address' => $request->address,
+                'password' => bcrypt($request->email),// Str::random(20),
+                'engineer_limit' => $request->engineer_limit,
+                'employee_limit' => $request->employee_limit,
+                'company_key' => Str::random(40),
+            ];
+            $company = Company::create($data);
+            if($company){
+            return response()->json(
+                [
+                    'status' => config('constant.messages.Success'),
+                    'message' => 'Company created Successfully',
+                    'code' => config('constant.codes.success'),
+                    'data' => $company,
+                ]);
+             }else{
                 return response()->json(
                     [
-                        'status' => config('constant.messages.Success'),
-                        'message' => 'Company created Successfully',
-                        'code' => config('constant.codes.success'),
-                        'data' => $company,
-                    ]);
-            }else{
-                return response()->json(
-                    [
-                        'status' => config('constant.messages.Unauthorized'),
-                        'message' => 'Invalid Role',
-                        'code' => config('constant.codes.Unauthorized'),
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Company not created',
+                        'code' => config('constant.codes.badRequest'),
                         'data' => [],
                     ]);
             }

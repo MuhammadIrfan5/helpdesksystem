@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('payment_methods', function (Blueprint $table) {
-            // $table->id();
+             $table->id();
             // $table->uuid();
-            $table->uuid('id')->primary();
+            $table->uuid('uuid');
             $table->enum('payment_method',['cash','online','cheque']);
             $table->string('payment_vendor');
             $table->longText('image_path')->unique();

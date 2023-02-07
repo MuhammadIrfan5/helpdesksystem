@@ -14,9 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::table('companies', function (Blueprint $table) {
-//            $table->foreignUuid('package_id')->after('city_id')->references('id')->on('packages');
-            $table->foreignId('package_id')->after('city_id')->constrained('packages')->onUpdate('cascade')
-                ->onDelete('cascade');
+            $table->string('engineer_limit')->after('password');
+            $table->string('employee_limit')->after('engineer_limit');
+            $table->string('secondary_email')->after('email')->unique()->nullable();
+            $table->longText('logo')->nullable()->change();
+            $table->text('company_key')->after('employee_limit');
         });
     }
 

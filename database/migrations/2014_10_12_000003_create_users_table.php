@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            // $table->id();
-            $table->uuid('id')->primary();
+             $table->id();
+            $table->uuid('uuid');
             // $table->uuid('uid');
             $table->string('first_name');
             $table->string('last_name');
@@ -25,9 +25,15 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('salt_key');
-            $table->foreignUuid('role_id')->references('id')->on('roles');
-            $table->foreignUuid('country_id')->references('id')->on('countries');
-            $table->foreignUuid('city_id')->references('id')->on('cities');
+            $table->foreignId('role_id')->constrained('roles')->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('country_id')->constrained('countries')->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('city_id')->constrained('cities')->onUpdate('cascade')
+                ->onDelete('cascade');
+//            $table->foreignUuid('role_id')->references('id')->on('roles');
+//            $table->foreignUuid('country_id')->references('id')->on('countries');
+//            $table->foreignUuid('city_id')->references('id')->on('cities');
             $table->rememberToken();
             $table->timestamps();
         });

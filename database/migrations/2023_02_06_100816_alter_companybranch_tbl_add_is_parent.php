@@ -13,13 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('roles', function (Blueprint $table) {
-             $table->id();
-            $table->uuid('uuid');
-            $table->string('name');
-            $table->string('slug');
-            $table->enum('status',['active','inactive']);
-            $table->timestamps();
+        Schema::table('company_branches', function (Blueprint $table) {
+            $table->string('is_main_branch')->after('company_id');
         });
     }
 
@@ -30,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('roles');
+        Schema::table('company_branches', function (Blueprint $table) {
+            //
+        });
     }
 };

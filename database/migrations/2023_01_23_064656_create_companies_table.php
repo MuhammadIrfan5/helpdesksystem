@@ -14,12 +14,18 @@ return new class extends Migration
     public function up()
     {
         Schema::create('companies', function (Blueprint $table) {
-            // $table->id();
+             $table->id();
             // $table->uuid();
-            $table->uuid('id')->primary();
-            $table->foreignUuid('user_created_by')->references('id')->on('users');
-            $table->foreignUuid('country_id')->references('id')->on('countries');
-            $table->foreignUuid('city_id')->references('id')->on('cities');
+            $table->uuid('uuid');
+            $table->foreignId('user_created_by')->constrained('users')->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('country_id')->constrained('countries')->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('city_id')->constrained('cities')->onUpdate('cascade')
+                ->onDelete('cascade');
+//            $table->foreignUuid('user_created_by')->references('id')->on('users');
+//            $table->foreignUuid('country_id')->references('id')->on('countries');
+//            $table->foreignUuid('city_id')->references('id')->on('cities');
             $table->string('registration_no')->unique();
             $table->string('name');
             $table->string('email')->unique();

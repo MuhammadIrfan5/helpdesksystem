@@ -14,11 +14,19 @@ return new class extends Migration
     public function up()
     {
         Schema::create('transactions', function (Blueprint $table) {
-            // $table->id();
-            $table->uuid('id')->primary();
-            $table->foreignUuid('company_id')->references('id')->on('companies');
-            $table->foreignUuid('branch_id')->references('id')->on('company_branches');
-            $table->foreignUuid('payment_method_id')->references('id')->on('payment_methods');
+            $table->id();
+            $table->uuid('uuid');
+            $table->foreignId('company_id')->constrained('companies')->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('branch_id')->constrained('company_branches')->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('role_id')->constrained('roles')->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->foreignId('payment_method_id')->constrained('payment_methods')->onUpdate('cascade')
+                ->onDelete('cascade');
+//            $table->foreignUuid('company_id')->references('id')->on('companies');
+//            $table->foreignUuid('branch_id')->references('id')->on('company_branches');
+//            $table->foreignUuid('payment_method_id')->references('id')->on('payment_methods');
             $table->string('amount');
             $table->string('paid_month');
             $table->date('paid_date');

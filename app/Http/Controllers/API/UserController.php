@@ -97,13 +97,13 @@ class UserController extends Controller
                 [
                     'status' => 'Validation Errors' ,
                     'message' => $validator->errors()->first(),
-                    'code' => config('constants.codes.Forbidden'),
+                    'code' => config('constant.codes.validation'),
                     'data' => [],
                 ]);
 
         } else {
             $user = User::where('email', $request['email'])->first();
-            if (!empty($user) && ( $user->role->slug === 'admin' || $user->role->slug === 'superadmin')) {
+            if (!empty($user) && ( $user->role->slug === 'admin' || $user->role->slug === 'super-admin')) {
                 if (!$user || !Hash::check($request["password"], $user->password)) {
                     return response()->json(
                         [
