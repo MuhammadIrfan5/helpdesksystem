@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -28,6 +30,59 @@ class EmployeeController extends Controller
     public function create()
     {
         //
+    }
+
+    public function login(Request $request){
+        $validationRules = [
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'status' => 'Validation Errors' ,
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constant.codes.validation'),
+                    'data' => [],
+                ]);
+
+        } else {
+            $employee = Employee::where('company_email', $request['email'])->first();
+            if (!empty($employee)) {
+                if (!Hash::check($request["password"], $employee->password)) {
+                    return response()->json(
+                        [
+                            'status' => config('constant.messages.Unauthorized'),
+                            'message' => 'Invalid Credentials',
+                            'code' => config('constant.codes.Unauthorized'),
+                            'data' => [],
+                        ]);
+                }else {
+                    if(!empty($employee->tokens())){
+                        $employee->tokens()->delete();
+                    }
+                    $token = $employee->createToken('employeeToken')->plainTextToken;
+                    $employee->save();
+                    $employee->employeeToken = $token;
+                    return response()->json(
+                        [
+                            'status' => config('constant.messages.loginSuccess'),
+                            'message' => 'Logged In',
+                            'code' => config('constant.codes.success'),
+                            'data' => $employee,
+                        ]);
+                }
+            }else {
+                return response()->json(
+                    [
+                        'status' => config('constant.messages.Unauthorized'),
+                        'message' => 'Invalid Role',
+                        'code' => config('constant.codes.Unauthorized'),
+                        'data' => [],
+                    ]);
+            }
+        }
     }
 
     /**
@@ -73,7 +128,7 @@ class EmployeeController extends Controller
                 'first_name' => $request->first_name,
                 'company_email' => $request->company_email,
                 'primary_phone_no' => $request->primary_phone_no,
-                'password'  => bcrypt($request->email), // Str::random(20)
+                'password'  => bcrypt($request->company_email), // Str::random(20)
                 'status' => $request->status,
             ];
             $employee = Employee::create($data);

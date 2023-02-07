@@ -44,7 +44,7 @@ class CompanyController extends Controller
                 [
                     'status' => 'Validation Errors' ,
                     'message' => $validator->errors()->first(),
-                    'code' => config('constants.codes.validation'),
+                    'code' => config('constant.codes.validation'),
                     'data' => [],
                 ]);
 
@@ -60,7 +60,9 @@ class CompanyController extends Controller
                             'data' => [],
                         ]);
                 }else {
-                    $company->tokens()->delete();
+                    if(!empty($company->tokens())){
+                        $company->tokens()->delete();
+                    }
                     $token = $company->createToken('companyToken')->plainTextToken;
                     $company->save();
                     $company->companyToken = $token;

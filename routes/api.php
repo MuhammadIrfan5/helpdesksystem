@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('login',[UserController::class,'login'])->name('login');
 Route::post('company_login',[\App\Http\Controllers\Company\CompanyController::class,'login'])->name('company_login');
+Route::post('employee_login',[\App\Http\Controllers\Company\EmployeeController::class,'login'])->name('employee_login');
 
 Route::prefix('Company')->namespace('company')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('company_create',[\App\Http\Controllers\Company\CompanyController::class,'store'])->name('company_create');
@@ -24,3 +25,4 @@ Route::prefix('Company')->namespace('company')->middleware(['auth:sanctum','admi
 Route::prefix('Employee')->namespace('employee')->middleware(['auth:sanctum','company'])->group(function () {
     Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create');
 });
+

@@ -113,7 +113,7 @@ class UserController extends Controller
                             'data' => [],
                         ]);
                 }else {
-                    $user->tokens()->delete();
+//                    $user->tokens()->delete();
                     $token = $user->createToken('userToken')->plainTextToken;
                     $user->remember_token = $token;
                     $user->save();

@@ -49,9 +49,9 @@ return [
             'driver' => 'sanctum',
             'provider' => 'company',
         ],
-        'engineer' => [
+        'employee' => [
             'driver' => 'sanctum',
-            'provider' => 'engineer',
+            'provider' => 'employee',
         ],
     ],
 
@@ -81,9 +81,9 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Company::class,
         ],
-        'engineer' => [
+        'employee' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Engineer::class,
+            'model' => App\Models\Employee::class,
         ],
         // 'users' => [
         //     'driver' => 'database',
