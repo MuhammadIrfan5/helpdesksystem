@@ -60,7 +60,6 @@ class CountryController extends Controller
         if ($validator->fails()) {
             $response["message"] = $validator->errors()->first();
         } else {
-            dd(Str::uuid());
             /*create user*/
             $apply = [
                 'uuid' => Str::uuid(),
