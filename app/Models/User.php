@@ -36,11 +36,14 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'salt_key',
-        'email_verified_at'
+        'email_verified_at',
+        'role_id',
+        'city_id',
+        'country_id'
     ];
 
     protected $with = [
-        'role:id,uuid,slug',
+        'role:id,uuid,slug,status',
         'country:id,uuid,name,code',
         'city:id,uuid,name,code,country_id'
     ];

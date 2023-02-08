@@ -17,7 +17,7 @@ class CompanyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if($request->header('Authorization') && Auth::guard('company')->check() && get_role_data_by_id(auth()->user()->role_id)['slug'] == 'company'){
+        if($request->header('Authorization') && Auth::guard('company')->check() && Auth::user()->role->slug == 'company' && Auth::user()->role->status == 'active'){
             if(auth()->user()->is_approved == 1) {
                 return $next($request);
             }else{

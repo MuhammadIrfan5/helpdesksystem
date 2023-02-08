@@ -49,7 +49,7 @@ class Company extends Authenticatable
     ];
 
     protected $with = [
-        'role:id,uuid,slug',
+        'role:id,uuid,slug,status',
         'country:id,uuid,name,code',
         'city:id,uuid,name,code,country_id',
         'package:id,uuid,name,package_cost',

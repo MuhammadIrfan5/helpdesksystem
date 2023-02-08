@@ -7,16 +7,17 @@
             'badRequest' => '400',
             'Unauthorized' => '401',
             'validation' => '403',
-            'notFound' => '401',
+            'notFound' => '404',
         ],
         'messages' => [
-            'loginSuccess' => 'User Login Successfully',
+            'loginSuccess' => 'Login Successfully',
             'ValidationError' => 'Validation Errors',
             'Invalidcreds' => 'Invalid Credentials',
             'InvalidRole' => 'Invalid Role',
             'Unauthorized' => 'User Unauthorized',
             'Success' => 'Success',
             'Failure' => 'Failure',
+            'notFound' => 'Data Not Found'
         ]
 
     ];

@@ -12,4 +12,11 @@ class Role extends Model
         'id'
     ];
 
+    protected $fillable = [
+        'uuid',
+        'name',
+        'slug',
+        'status'
+    ];
+
 }

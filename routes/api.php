@@ -26,3 +26,17 @@ Route::prefix('Employee')->namespace('employee')->middleware(['auth:sanctum','co
     Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create');
 });
 
+Route::prefix('admin/role')->namespace('role')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+//    ROLES ROUTES
+    Route::post('create', [\App\Http\Controllers\CommonAPI\RoleController::class, 'store'])->name('create');
+    Route::get('show_all', [\App\Http\Controllers\CommonAPI\RoleController::class, 'index'])->name('show_all');
+    Route::delete('delete/{uuid}', [\App\Http\Controllers\CommonAPI\RoleController::class, 'destroy'])->name('delete');
+    Route::post('update', [\App\Http\Controllers\CommonAPI\RoleController::class, 'update'])->name('update');
+});
+Route::prefix('admin/type')->namespace('employeetype')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+//    EMPLOYEE TYPE ROUTES
+    Route::post('create_type',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'store'])->name('create_type');
+    Route::get('show_all_type',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'index'])->name('show_all_type');
+    Route::delete('delete_type/{uuid}',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'destroy'])->name('delete_type');
+    Route::post('update_type',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'update'])->name('update_type');
+});

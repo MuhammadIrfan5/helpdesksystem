@@ -12,4 +12,11 @@ class EmployeeType extends Model
         'id'
     ];
     protected $table = 'employee_type';
+
+    protected $fillable = [
+        'uuid',
+        'type',
+        'slug',
+        'status'
+    ];
 }
