@@ -17,7 +17,10 @@ class SuperAdminMiddleware
      */
     public function handle(Request $request, Closure $next,...$role)
     {
-        if ($request->hasHeader( 'Authorization' ) && Auth::guard('users')->check() && (Auth::user()->role->slug == $role[0] || Auth::user()->role->slug == $role[1]) ) {
+        if ($request->hasHeader( 'Authorization' )
+            && Auth::guard('users')->check()
+            && (Auth::user()->role->slug == $role[0] || Auth::user()->role->slug == $role[1])
+            && $request->accepts(['application/json']) ) {
             return $next($request);
         }else {
             return response()->json(

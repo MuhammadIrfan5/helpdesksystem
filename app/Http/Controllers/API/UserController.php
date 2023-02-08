@@ -87,56 +87,66 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $validationRules = [
-            'email' => 'required|string',
-            'password' => 'required|string',
-        ];
-        $validator = Validator::make($request->all(), $validationRules);
-        if ($validator->fails()) {
-            return response()->json(
-                [
-                    'status' => 'Validation Errors' ,
-                    'message' => $validator->errors()->first(),
-                    'code' => config('constant.codes.validation'),
-                    'data' => [],
-                ]);
+        if ($request->accepts(['application/json'])) {
+            $validationRules = [
+                'email' => 'required|string',
+                'password' => 'required|string',
+            ];
+            $validator = Validator::make($request->all(), $validationRules);
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'status' => 'Validation Errors',
+                        'message' => $validator->errors()->first(),
+                        'code' => config('constant.codes.validation'),
+                        'data' => [],
+                    ]);
 
-        } else {
-            $user = User::Where('email', $request['email'])->first();
-            if (!empty($user) && ( $user->role->slug === 'admin' || $user->role->slug === 'super-admin')) {
-                if (!$user || !Hash::check($request["password"], $user->password)) {
+            } else {
+                $user = User::Where('email', $request['email'])->first();
+                if (!empty($user) && ($user->role->slug === 'admin' || $user->role->slug === 'super-admin')) {
+                    if (!$user || !Hash::check($request["password"], $user->password)) {
+                        return response()->json(
+                            [
+                                'status' => config('constant.messages.Unauthorized'),
+                                'message' => 'Invalid Credentials',
+                                'code' => config('constant.codes.Unauthorized'),
+                                'data' => [],
+                            ]);
+                    } else {
+                        if ($user != null) {
+                            $user->tokens()->delete();
+                        }
+                        $token = $user->createToken('userToken')->plainTextToken;
+                        $user->remember_token = $token;
+                        $user->save();
+                        $user->usertoken = $token;
+                        return response()->json(
+                            [
+                                'status' => config('constant.messages.loginSuccess'),
+                                'message' => 'Logged In',
+                                'code' => config('constant.codes.success'),
+                                'data' => $user,
+                            ]);
+                    }
+                } else {
                     return response()->json(
                         [
                             'status' => config('constant.messages.Unauthorized'),
-                            'message' => 'Invalid Credentials',
+                            'message' => 'Invalid Role',
                             'code' => config('constant.codes.Unauthorized'),
                             'data' => [],
                         ]);
-                }else {
-                    if($user != null){
-                        $user->tokens()->delete();
-                    }
-                    $token = $user->createToken('userToken')->plainTextToken;
-                    $user->remember_token = $token;
-                    $user->save();
-                    $user->usertoken = $token;
-                   return response()->json(
-                        [
-                            'status' => config('constant.messages.loginSuccess'),
-                            'message' => 'Logged In',
-                            'code' => config('constant.codes.success'),
-                            'data' => $user,
-                        ]);
                 }
-            }else {
-                return response()->json(
-                [
-                    'status' => config('constant.messages.Unauthorized'),
-                    'message' => 'Invalid Role',
-                    'code' => config('constant.codes.Unauthorized'),
-                    'data' => [],
-                ]);
             }
+        }else{
+        return response()->json(
+            [
+                'status' => config('constant.messages.badRequest'),
+                'message' => 'Only Accepts Application json',
+                'code' => config('constant.codes.badRequest'),
+                'data' => [],
+            ]);
         }
     }
 

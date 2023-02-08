@@ -17,7 +17,8 @@
             'Unauthorized' => 'User Unauthorized',
             'Success' => 'Success',
             'Failure' => 'Failure',
-            'notFound' => 'Data Not Found'
+            'notFound' => 'Data Not Found',
+            'badRequest' => 'Bad Request',
         ]
 
     ];

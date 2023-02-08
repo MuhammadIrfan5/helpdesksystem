@@ -33,55 +33,65 @@ class EmployeeController extends Controller
     }
 
     public function login(Request $request){
-        $validationRules = [
-            'email' => 'required|string',
-            'password' => 'required|string',
-        ];
-        $validator = Validator::make($request->all(), $validationRules);
-        if ($validator->fails()) {
-            return response()->json(
-                [
-                    'status' => 'Validation Errors' ,
-                    'message' => $validator->errors()->first(),
-                    'code' => config('constant.codes.validation'),
-                    'data' => [],
-                ]);
+        if ($request->accepts(['application/json'])) {
+            $validationRules = [
+                'email' => 'required|string',
+                'password' => 'required|string',
+            ];
+            $validator = Validator::make($request->all(), $validationRules);
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'status' => 'Validation Errors',
+                        'message' => $validator->errors()->first(),
+                        'code' => config('constant.codes.validation'),
+                        'data' => [],
+                    ]);
 
-        } else {
-            $employee = Employee::where('company_email', $request['email'])->first();
-            if (!empty($employee)) {
-                if (!Hash::check($request["password"], $employee->password)) {
+            } else {
+                $employee = Employee::where('company_email', $request['email'])->first();
+                if (!empty($employee)) {
+                    if (!Hash::check($request["password"], $employee->password)) {
+                        return response()->json(
+                            [
+                                'status' => config('constant.messages.Unauthorized'),
+                                'message' => 'Invalid Credentials',
+                                'code' => config('constant.codes.Unauthorized'),
+                                'data' => [],
+                            ]);
+                    } else {
+                        if (!empty($employee->tokens())) {
+                            $employee->tokens()->delete();
+                        }
+                        $token = $employee->createToken('employeeToken')->plainTextToken;
+                        $employee->save();
+                        $employee->employeeToken = $token;
+                        return response()->json(
+                            [
+                                'status' => config('constant.messages.loginSuccess'),
+                                'message' => 'Logged In',
+                                'code' => config('constant.codes.success'),
+                                'data' => $employee,
+                            ]);
+                    }
+                } else {
                     return response()->json(
                         [
                             'status' => config('constant.messages.Unauthorized'),
-                            'message' => 'Invalid Credentials',
+                            'message' => 'Invalid Role',
                             'code' => config('constant.codes.Unauthorized'),
                             'data' => [],
                         ]);
-                }else {
-                    if(!empty($employee->tokens())){
-                        $employee->tokens()->delete();
-                    }
-                    $token = $employee->createToken('employeeToken')->plainTextToken;
-                    $employee->save();
-                    $employee->employeeToken = $token;
-                    return response()->json(
-                        [
-                            'status' => config('constant.messages.loginSuccess'),
-                            'message' => 'Logged In',
-                            'code' => config('constant.codes.success'),
-                            'data' => $employee,
-                        ]);
                 }
-            }else {
-                return response()->json(
-                    [
-                        'status' => config('constant.messages.Unauthorized'),
-                        'message' => 'Invalid Role',
-                        'code' => config('constant.codes.Unauthorized'),
-                        'data' => [],
-                    ]);
             }
+        }else{
+        return response()->json(
+            [
+                'status' => config('constant.messages.badRequest'),
+                'message' => 'Only Accepts Application json',
+                'code' => config('constant.codes.badRequest'),
+                'data' => [],
+            ]);
         }
     }
 
