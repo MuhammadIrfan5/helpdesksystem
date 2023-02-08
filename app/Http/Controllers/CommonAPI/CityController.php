@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\CommonAPI;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use Illuminate\Http\Request;
-use App\Traits\UUID;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 class CityController extends Controller
 {
     /**
@@ -30,32 +33,47 @@ class CityController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'country_id' => 'required',
-            'code' => 'required|min:2',
-            'status' => 'required',
-        ]);
-            $user = User::create([
-                'uuid' => Str::uuid,
-                'country_id' => $request->country_id,
+        /*Response format*/
+        $response = [
+            "success" => false,
+            "message" => ""
+        ];
+        /*validation*/
+        $validationRules = [
+            "countryId" => "required|exist:countries,id",
+            "name" => "required",
+            "code" => "required",
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        /*check is validation success*/
+        if ($validator->fails()) {
+            $response["message"] = $validator->errors()->first();
+        } else {
+            /*create user*/
+            $data = [
+                'uuid' => Str::uuid(),
+                'country_id' => $request->countryId,
+                'name' => $request->name,
                 'code' => $request->code,
-                'status' => $request->status,
-            ]);
-
-            $token = $user->createToken('Laravel9PassportAuth')->accessToken;
-
-            return response()->json(['token' => $token], 200);
+                'status' => 'active',
+            ];
+            $result = City::create($data);
+            /*make response*/
+            $response["success"] = true;
+            $response["message"] = "Application Submitted!";
+        }
+        return response($response);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -66,7 +84,7 @@ class CityController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -77,19 +95,52 @@ class CityController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        //
+        /*Response format*/
+        $response = [
+            "success" => false,
+            "message" => ""
+        ];
+        /*validation*/
+        $validationRules = [
+            "cityId" => "required|exist:cities,id",
+            "name" => "nullable",
+            "code" => "nullable",
+            "status" => "nullable|",
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        /*check is validation success*/
+        if ($validator->fails()) {
+            $response["message"] = $validator->errors()->first();
+        } else {
+            /*update city*/
+            $result = City::where('uuid', $request->cityId)->first();
+            if (!empty($request->phone)) {
+                $result->name = $request->name;
+            }
+            if (!empty($request->phone)) {
+                $result->code = $request->code;
+            }
+            if (!empty($request->phone)) {
+                $result->status = $request->status;
+            }
+            $result->update();
+            /*make response*/
+            $response["success"] = true;
+            $response["message"] = "Application Submitted!";
+        }
+        return response($response);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

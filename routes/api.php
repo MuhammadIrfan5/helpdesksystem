@@ -23,6 +23,11 @@ Route::prefix('Company')->namespace('company')->middleware(['auth:sanctum','admi
 });
 Route::prefix('admin/country')->namespace('country')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('country_create',[\App\Http\Controllers\CommonAPI\CountryController::class,'store'])->name('company_create');
+    Route::post('delete_create',[\App\Http\Controllers\CommonAPI\CountryController::class,'update'])->name('company_create');
+});
+Route::prefix('admin/city')->namespace('city')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+    Route::post('city_create',[\App\Http\Controllers\CommonAPI\CityController::class,'store'])->name('company_create');
+    Route::post('delete_city',[\App\Http\Controllers\CommonAPI\CityController::class,'update'])->name('company_create');
 });
 Route::prefix('Employee')->namespace('employee')->middleware(['auth:sanctum','company'])->group(function () {
     Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create');
