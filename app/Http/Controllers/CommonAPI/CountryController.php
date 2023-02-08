@@ -30,7 +30,6 @@ class CountryController extends Controller
 
     }
 
-
     /**
      * Store a newly created resource in storage.
      *
@@ -113,7 +112,63 @@ class CountryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        /*Response format*/
+        $response = [
+            "success" => false,
+            "message" => ""
+        ];
+        /*validation*/
+        $validationRules = [
+            "countryId" => "required|exists:countries,id",
+            "phone" => "nullable|min:11|numeric",
+            "code" => "nullable",
+            "name" => "nullable",
+            "symbol" => "nullable",
+            "capital" => "nullable",
+            "currency" => "nullable",
+            "continent" => "nullable",
+            "continentCode" => "nullable",
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        /*check is validation success*/
+        if ($validator->fails()) {
+            $response["message"] = $validator->errors()->first();
+        } else {
+            /*update country*/
+            $result = Country::where('uuid', $request->uuId)->first();
+            if (!empty($request->phone)) {
+                $result->phone = $request->phone;
+            }
+            if (!empty($request->code)) {
+                $result->code = $request->code;
+            }
+            if (!empty($request->code)) {
+                $result->name = $request->name;
+            }
+            if (!empty($request->code)) {
+                $result->symbol = $request->symbol;
+            }
+            if (!empty($request->code)) {
+                $result->capital = $request->capital;
+            }
+            if (!empty($request->code)) {
+                $result->currency = $request->currency;
+            }
+            if (!empty($request->code)) {
+                $result->continent = $request->continent;
+            }
+            if (!empty($request->code)) {
+                $result->continent_code = $request->continentCode;
+            }
+            if (!empty($request->code)) {
+                $result->status = 'active';
+            }
+            $result->save();
+            /*make response*/
+            $response["success"] = true;
+            $response["message"] = "Application Submitted!";
+        }
+        return response($response);
     }
 
     /**
