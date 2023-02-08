@@ -21,7 +21,9 @@ Route::post('employee_login',[\App\Http\Controllers\Company\EmployeeController::
 Route::prefix('Company')->namespace('company')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('company_create',[\App\Http\Controllers\Company\CompanyController::class,'store'])->name('company_create');
 });
-
+Route::prefix('Country')->namespace('country')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+    Route::post('country_create',[\App\Http\Controllers\CommonAPI\CountryController::class,'store'])->name('company_create');
+});
 Route::prefix('Employee')->namespace('employee')->middleware(['auth:sanctum','company'])->group(function () {
     Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create');
 });
