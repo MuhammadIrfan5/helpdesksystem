@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class CountryController extends Controller
 {
@@ -25,6 +26,18 @@ class CountryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
+    {
+
+    }
+
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
     {
         /*Response format*/
         $response = [
@@ -47,9 +60,10 @@ class CountryController extends Controller
         if ($validator->fails()) {
             $response["message"] = $validator->errors()->first();
         } else {
+            dd(Str::uuid());
             /*create user*/
             $apply = [
-                'uuid' => $request->user()['id'],
+                'uuid' => Str::uuid(),
                 'phone' => $request->phone,
                 'code' => $request->code,
                 'name' => $request->name,
@@ -67,18 +81,6 @@ class CountryController extends Controller
             $response["message"] = "Application Submitted!";
         }
         return response($response);
-    }
-
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-
     }
 
     /**
