@@ -17,7 +17,24 @@ class CountryController extends Controller
      */
     public function index()
     {
-        //
+        $role = Country::all();
+        if(!empty($role)) {
+            return response()->json(
+                [
+                    'status' => config('constant.messages.Success'),
+                    'message' => 'All record list',
+                    'code' => config('constant.codes.success'),
+                    'data' => $role,
+                ]);
+        }else{
+            return response()->json(
+                [
+                    'status' => config('constant.messages.Failure'),
+                    'message' => 'No roles found',
+                    'code' => config('constant.codes.badRequest'),
+                    'data' => [],
+                ]);
+        }
     }
 
     /**
@@ -179,6 +196,24 @@ class CountryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $role = Country::where('uuid',$id)->first();
+        if($role){
+            $role->delete();
+            return response()->json(
+                [
+                    'status' => config('constant.messages.Success'),
+                    'message' => 'Record deleted successfully',
+                    'code' => config('constant.codes.success'),
+                    'data' => [],
+                ]);
+        }else{
+            return response()->json(
+                [
+                    'status' => config('constant.messages.Failure'),
+                    'message' => 'Record not delete',
+                    'code' => config('constant.codes.badRequest'),
+                    'data' => [],
+                ]);
+        }
     }
 }
