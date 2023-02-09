@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CompanyMiddleware
 {
@@ -17,15 +18,13 @@ class CompanyMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if($request->header('Authorization') && Auth::guard('company')->check()
-            && Auth::user()->role->slug == 'company' &&
-            Auth::user()->role->status == 'active' &&
-            $request->accepts(['application/json'])){
-            if(auth()->user()->is_approved == 1) {
+        if($request->header('Authorization') && Auth::guard('company')->check() && Auth::user()->role->slug == 'company' && $request->accepts(['application/json'])){
+            if(auth()->user()->is_approved == 1 && strtolower(Auth::user()->role->status)  == 'active') {
                 return $next($request);
             }else{
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => config('constant.messages.Unauthorized'),
                         'message' => 'Account Not Active',
                         'code' => config('constant.codes.Unauthorized'),
@@ -35,6 +34,7 @@ class CompanyMiddleware
         }else {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => config('constant.messages.Unauthorized'),
                     'message' => 'Unauthorized Access',
                     'code' => config('constant.codes.Unauthorized'),

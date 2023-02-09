@@ -33,7 +33,8 @@ class CompanyController extends Controller
         //
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         if ($request->accepts(['application/json'])) {
             $validationRules = [
                 'email' => 'required|string',
@@ -43,6 +44,7 @@ class CompanyController extends Controller
             if ($validator->fails()) {
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => 'Validation Errors',
                         'message' => $validator->errors()->first(),
                         'code' => config('constant.codes.validation'),
@@ -52,54 +54,69 @@ class CompanyController extends Controller
             } else {
                 $company = Company::where('email', $request['email'])->first();
                 if (!empty($company)) {
-                    if (!Hash::check($request["password"], $company->password)) {
+                    if($company->is_approved == 1 && strtolower($company->status) == 'active') {
+                        if (!Hash::check($request["password"], $company->password)) {
+                            return response()->json(
+                                [
+                                    'success' => false,
+                                    'status' => config('constant.messages.Unauthorized'),
+                                    'message' => 'Invalid Credentials',
+                                    'code' => config('constant.codes.Unauthorized'),
+                                    'data' => [],
+                                ]);
+                        } else {
+                            if (!empty($company->tokens())) {
+                                $company->tokens()->delete();
+                            }
+                            $token = $company->createToken('companyToken')->plainTextToken;
+                            $company->save();
+                            $company->companyToken = $token;
+                            return response()->json(
+                                [
+                                    'success' => true,
+                                    'status' => config('constant.messages.loginSuccess'),
+                                    'message' => 'Logged In',
+                                    'code' => config('constant.codes.success'),
+                                    'data' => $company,
+                                ]);
+                        }
+                    }else{
                         return response()->json(
                             [
+                                'success' => false,
                                 'status' => config('constant.messages.Unauthorized'),
-                                'message' => 'Invalid Credentials',
+                                'message' => 'Account is inactive',
                                 'code' => config('constant.codes.Unauthorized'),
                                 'data' => [],
-                            ]);
-                    } else {
-                        if (!empty($company->tokens())) {
-                            $company->tokens()->delete();
-                        }
-                        $token = $company->createToken('companyToken')->plainTextToken;
-                        $company->save();
-                        $company->companyToken = $token;
-                        return response()->json(
-                            [
-                                'status' => config('constant.messages.loginSuccess'),
-                                'message' => 'Logged In',
-                                'code' => config('constant.codes.success'),
-                                'data' => $company,
                             ]);
                     }
                 } else {
                     return response()->json(
                         [
+                            'success' => false,
                             'status' => config('constant.messages.Unauthorized'),
-                            'message' => 'Invalid Role',
+                            'message' => 'Company Not Exists',
                             'code' => config('constant.codes.Unauthorized'),
                             'data' => [],
                         ]);
                 }
+
             }
-        }else{
-        return response()->json(
-            [
-                'status' => config('constant.messages.badRequest'),
-                'message' => 'Only Accepts Application json',
-                'code' => config('constant.codes.badRequest'),
-                'data' => [],
-            ]);
+        } else {
+            return response()->json(
+                [
+                    'status' => config('constant.messages.badRequest'),
+                    'message' => 'Only Accepts Application json',
+                    'code' => config('constant.codes.badRequest'),
+                    'data' => [],
+                ]);
         }
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -118,18 +135,19 @@ class CompanyController extends Controller
             'address' => 'required',
             'engineer_limit' => 'required',
             'employee_limit' => 'required',
+            'status' => 'required,enum:[active,inactive]',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
             return response()->json(
                 [
-                    'status' => 'Validation Errors' ,
+                    'status' => 'Validation Errors',
                     'message' => $validator->errors()->first(),
                     'code' => config('constants.codes.validation'),
                     'data' => [],
                 ]);
         } else {
-        $data = [
+            $data = [
                 'uuid' => Str::uuid(),
                 'user_created_by' => auth()->user()->id,
                 'country_id' => $request->country_id,
@@ -148,17 +166,18 @@ class CompanyController extends Controller
                 'engineer_limit' => $request->engineer_limit,
                 'employee_limit' => $request->employee_limit,
                 'company_key' => Str::random(40),
+                'status' => $request->status,
             ];
             $company = Company::create($data);
-            if($company){
-            return response()->json(
-                [
-                    'status' => config('constant.messages.Success'),
-                    'message' => 'Company created Successfully',
-                    'code' => config('constant.codes.success'),
-                    'data' => $company,
-                ]);
-             }else{
+            if ($company) {
+                return response()->json(
+                    [
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Company created Successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => $company,
+                    ]);
+            } else {
                 return response()->json(
                     [
                         'status' => config('constant.messages.Failure'),
@@ -173,7 +192,7 @@ class CompanyController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -184,7 +203,7 @@ class CompanyController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -195,8 +214,8 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -207,7 +226,7 @@ class CompanyController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

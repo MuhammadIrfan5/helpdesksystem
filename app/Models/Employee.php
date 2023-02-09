@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -41,7 +42,7 @@ class Employee extends Authenticatable
         'role:id,uuid,slug',
         'country:id,uuid,name,code',
         'city:id,uuid,name,code,country_id',
-        'company:id,uuid,name,email,package_id,country_id,city_id,role_id,user_created_by',
+        'company:id,uuid,name,email,package_id,country_id,city_id,role_id,user_created_by,status,is_approved',
         'employee_type:id,uuid,type'
     ];
 
@@ -73,4 +74,34 @@ class Employee extends Authenticatable
     public function employee_type(){
         return $this->belongsTo(EmployeeType::class);
     }
+
+    protected function firstName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+    protected function lastName(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+    protected function companyEmail(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => strtolower($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+
 }

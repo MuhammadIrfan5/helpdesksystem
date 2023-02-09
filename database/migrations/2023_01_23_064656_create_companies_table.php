@@ -37,6 +37,7 @@ return new class extends Migration
             $table->double('longitude');
             $table->boolean('is_approved');
             $table->string('password');
+            $table->enum('status',['active','inactive']);
             $table->timestamps();
         });
     }

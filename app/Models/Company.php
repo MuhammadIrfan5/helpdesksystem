@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -37,6 +38,7 @@ class Company extends Authenticatable
         'engineer_limit',
         'employee_limit',
         'company_key',
+        'status'
     ];
 
     protected $hidden = [
@@ -83,5 +85,34 @@ class Company extends Authenticatable
 
     public function created_by(){
         return $this->belongsTo(User::class,'user_created_by','id');
+    }
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+    protected function secondaryEmail(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => strtolower($value),
+            set: fn ($value) => strtolower($value),
+        );
     }
 }

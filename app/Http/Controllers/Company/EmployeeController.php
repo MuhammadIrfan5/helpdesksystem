@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -51,27 +52,47 @@ class EmployeeController extends Controller
             } else {
                 $employee = Employee::where('company_email', $request['email'])->first();
                 if (!empty($employee)) {
-                    if (!Hash::check($request["password"], $employee->password)) {
+                    if($employee->company->is_approved == 1 && strtolower($employee->company->status) == 'active') {
+                        if (strtolower($employee->status) == 'active') {
+                            if (!Hash::check($request["password"], $employee->password)) {
+                                return response()->json(
+                                    [
+                                        'status' => config('constant.messages.Unauthorized'),
+                                        'message' => 'Invalid Credentials',
+                                        'code' => config('constant.codes.Unauthorized'),
+                                        'data' => [],
+                                    ]);
+                            } else {
+                                if (!empty($employee->tokens())) {
+                                    $employee->tokens()->delete();
+                                }
+                                $token = $employee->createToken('employeeToken')->plainTextToken;
+                                $employee->save();
+                                $employee->employeeToken = $token;
+                                return response()->json(
+                                    [
+                                        'status' => config('constant.messages.loginSuccess'),
+                                        'message' => 'Logged In',
+                                        'code' => config('constant.codes.success'),
+                                        'data' => $employee,
+                                    ]);
+                            }
+                        } else {
+                            return response()->json(
+                                [
+                                    'status' => config('constant.messages.Unauthorized'),
+                                    'message' => 'your account is inactive',
+                                    'code' => config('constant.codes.Unauthorized'),
+                                    'data' => [],
+                                ]);
+                        }
+                    }else{
                         return response()->json(
                             [
                                 'status' => config('constant.messages.Unauthorized'),
-                                'message' => 'Invalid Credentials',
+                                'message' => 'Company account is inactive',
                                 'code' => config('constant.codes.Unauthorized'),
                                 'data' => [],
-                            ]);
-                    } else {
-                        if (!empty($employee->tokens())) {
-                            $employee->tokens()->delete();
-                        }
-                        $token = $employee->createToken('employeeToken')->plainTextToken;
-                        $employee->save();
-                        $employee->employeeToken = $token;
-                        return response()->json(
-                            [
-                                'status' => config('constant.messages.loginSuccess'),
-                                'message' => 'Logged In',
-                                'code' => config('constant.codes.success'),
-                                'data' => $employee,
                             ]);
                     }
                 } else {
