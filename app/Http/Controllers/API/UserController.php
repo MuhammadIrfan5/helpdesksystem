@@ -109,6 +109,7 @@ class UserController extends Controller
                     if (!$user || !Hash::check($request["password"], $user->password)) {
                         return response()->json(
                             [
+                                'success' => false,
                                 'status' => config('constant.messages.Unauthorized'),
                                 'message' => 'Invalid Credentials',
                                 'code' => config('constant.codes.Unauthorized'),
@@ -124,6 +125,7 @@ class UserController extends Controller
                         $user->usertoken = $token;
                         return response()->json(
                             [
+                                'success' => true,
                                 'status' => config('constant.messages.loginSuccess'),
                                 'message' => 'Logged In',
                                 'code' => config('constant.codes.success'),
@@ -133,6 +135,7 @@ class UserController extends Controller
                 } else {
                     return response()->json(
                         [
+                            'success' => false,
                             'status' => config('constant.messages.Unauthorized'),
                             'message' => 'Invalid Role',
                             'code' => config('constant.codes.Unauthorized'),
@@ -143,6 +146,7 @@ class UserController extends Controller
         }else{
         return response()->json(
             [
+                'success' => false,
                 'status' => config('constant.messages.badRequest'),
                 'message' => 'Only Accepts Application json',
                 'code' => config('constant.codes.badRequest'),
