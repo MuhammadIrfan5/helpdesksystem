@@ -57,6 +57,7 @@ class EmployeeController extends Controller
                             if (!Hash::check($request["password"], $employee->password)) {
                                 return response()->json(
                                     [
+                                        'success' => false,
                                         'status' => config('constant.messages.Unauthorized'),
                                         'message' => 'Invalid Credentials',
                                         'code' => config('constant.codes.Unauthorized'),
@@ -71,6 +72,7 @@ class EmployeeController extends Controller
                                 $employee->employeeToken = $token;
                                 return response()->json(
                                     [
+                                        'success' => true,
                                         'status' => config('constant.messages.loginSuccess'),
                                         'message' => 'Logged In',
                                         'code' => config('constant.codes.success'),
@@ -80,6 +82,7 @@ class EmployeeController extends Controller
                         } else {
                             return response()->json(
                                 [
+                                    'success' => false,
                                     'status' => config('constant.messages.Unauthorized'),
                                     'message' => 'your account is inactive',
                                     'code' => config('constant.codes.Unauthorized'),
@@ -89,6 +92,7 @@ class EmployeeController extends Controller
                     }else{
                         return response()->json(
                             [
+                                'success' => false,
                                 'status' => config('constant.messages.Unauthorized'),
                                 'message' => 'Company account is inactive',
                                 'code' => config('constant.codes.Unauthorized'),
@@ -98,6 +102,7 @@ class EmployeeController extends Controller
                 } else {
                     return response()->json(
                         [
+                            'success' => false,
                             'status' => config('constant.messages.Unauthorized'),
                             'message' => 'Invalid Role',
                             'code' => config('constant.codes.Unauthorized'),
@@ -108,6 +113,7 @@ class EmployeeController extends Controller
         }else{
         return response()->json(
             [
+                'success' => false,
                 'status' => config('constant.messages.badRequest'),
                 'message' => 'Only Accepts Application json',
                 'code' => config('constant.codes.badRequest'),
@@ -141,6 +147,7 @@ class EmployeeController extends Controller
         if ($validator->fails()) {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => 'Validation Errors' ,
                     'message' => $validator->errors()->first(),
                     'code' => config('constant.codes.validation'),
@@ -166,6 +173,7 @@ class EmployeeController extends Controller
             if($employee){
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => config('constant.messages.Success'),
                         'message' => 'Record created successfully',
                         'code' => config('constant.codes.success'),
@@ -174,6 +182,7 @@ class EmployeeController extends Controller
             }else{
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => config('constant.messages.Failure'),
                         'message' => 'Data not created',
                         'code' => config('constant.codes.badRequest'),

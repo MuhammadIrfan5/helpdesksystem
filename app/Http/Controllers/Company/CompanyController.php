@@ -105,6 +105,7 @@ class CompanyController extends Controller
         } else {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => config('constant.messages.badRequest'),
                     'message' => 'Only Accepts Application json',
                     'code' => config('constant.codes.badRequest'),
@@ -141,6 +142,7 @@ class CompanyController extends Controller
         if ($validator->fails()) {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => 'Validation Errors',
                     'message' => $validator->errors()->first(),
                     'code' => config('constants.codes.validation'),
@@ -172,6 +174,7 @@ class CompanyController extends Controller
             if ($company) {
                 return response()->json(
                     [
+                        'success' => true,
                         'status' => config('constant.messages.Success'),
                         'message' => 'Company created Successfully',
                         'code' => config('constant.codes.success'),
@@ -180,6 +183,49 @@ class CompanyController extends Controller
             } else {
                 return response()->json(
                     [
+                        'success' => false,
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Company not created',
+                        'code' => config('constant.codes.badRequest'),
+                        'data' => [],
+                    ]);
+            }
+        }
+    }
+
+    public function block_unblock_company_account(Request $request){
+        $validationRules = [
+            'uuid' => 'required|uuid|exists:companies,uuid',
+            'status' => 'required',
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constants.codes.validation'),
+                    'data' => [],
+                ]);
+        } else {
+            $company = Company::where('uuid', $request->uuid)->first();
+            if($company != null){
+                $company->status = $request->status;
+                $company->update();
+                $company->touch();
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Company ' . (($request->status == 'active') ? 'Activated' : 'Inactived') .' Successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => [],
+                    ]);
+            }else{
+                return response()->json(
+                    [
+                        'success' => false,
                         'status' => config('constant.messages.Failure'),
                         'message' => 'Company not created',
                         'code' => config('constant.codes.badRequest'),
