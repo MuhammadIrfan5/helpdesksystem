@@ -17,7 +17,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $role = Role::all();
+        $role = Role::where('status','active')->get();
         if(!empty($role)) {
             return response()->json(
                 [
@@ -31,7 +31,7 @@ class RoleController extends Controller
                 [
                     'status' => config('constant.messages.Failure'),
                     'message' => 'No roles found',
-                    'code' => config('constant.codes.badRequest'),
+                    'code' => config('constant.codes.Failure'),
                     'data' => [],
                 ]);
         }

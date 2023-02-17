@@ -23,8 +23,8 @@ Route::prefix('Company')->namespace('company')->middleware(['auth:sanctum','admi
 });
 Route::prefix('admin/country')->namespace('country')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('country_create',[\App\Http\Controllers\CommonAPI\CountryController::class,'store'])->name('company_create');
-    Route::post('update',[\App\Http\Controllers\CommonAPI\CountryController::class,'update'])->name('company_create');
-    Route::post('delete_country',[\App\Http\Controllers\CommonAPI\CountryController::class,'destroy'])->name('company_create');
+    Route::post('update',[\App\Http\Controllers\CommonAPI\CountryController::class,'update'])->name('company_update');
+    Route::post('delete_country',[\App\Http\Controllers\CommonAPI\CountryController::class,'destroy'])->name('company_delete');
 });
 Route::prefix('admin/city')->namespace('city')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('city_create',[\App\Http\Controllers\CommonAPI\CityController::class,'store'])->name('company_create');
@@ -49,4 +49,9 @@ Route::prefix('admin/type')->namespace('employeetype')->middleware(['auth:sanctu
     Route::get('show_all_type',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'index'])->name('show_all_type');
     Route::delete('delete_type/{uuid}',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'destroy'])->name('delete_type');
     Route::post('update_type',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'update'])->name('update_type');
+});
+
+Route::prefix('admin/packages')->namespace('employeetype')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+//    PACKAGES ROUTES
+    Route::get('show_all_packages',[\App\Http\Controllers\CommonAPI\PackageController::class,'index'])->name('show_all_packages');
 });

@@ -80,7 +80,7 @@ class Company extends Authenticatable
     }
 
     public function package(){
-        return $this->belongsTo(Package::class);
+        return $this->belongsTo(Package::class)->where('status','active');
     }
 
     public function created_by(){
