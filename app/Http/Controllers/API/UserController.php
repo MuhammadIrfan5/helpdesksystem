@@ -166,4 +166,44 @@ class UserController extends Controller
         return URL::to('/' . $image_url); // Just return image
     }
 
+    public function logout(Request $request){
+        if ($request->accepts(['application/json'])) {
+            $validationRules = [
+                'uuid' => 'required|exists:users,uuid',
+                'email' => 'required|exists:users,email',
+            ];
+            $validator = Validator::make($request->all(), $validationRules);
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'status' => 'Validation Errors',
+                        'message' => $validator->errors()->first(),
+                        'code' => config('constant.codes.validation'),
+                        'data' => [],
+                    ]);
+
+            } else {
+                $user = User::Where('uuid', $request->uuid)->where('email',$request->email)->first();
+                $user->tokens()->delete();
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Logout Successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => [],
+                    ]);
+            }
+        }else{
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => config('constant.messages.badRequest'),
+                    'message' => 'Only Accepts Application json',
+                    'code' => config('constant.codes.badRequest'),
+                    'data' => [],
+                ]);
+        }
+    }
+
 }

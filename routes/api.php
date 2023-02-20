@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('login',[UserController::class,'login'])->name('login');
+
 Route::post('company_login',[\App\Http\Controllers\Company\CompanyController::class,'login'])->name('company_login');
 Route::post('employee_login',[\App\Http\Controllers\Company\EmployeeController::class,'login'])->name('employee_login');
 
@@ -55,4 +56,8 @@ Route::prefix('admin/type')->namespace('employeetype')->middleware(['auth:sanctu
 Route::prefix('admin/packages')->namespace('employeetype')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
 //    PACKAGES ROUTES
     Route::get('show_all_packages',[\App\Http\Controllers\CommonAPI\PackageController::class,'index'])->name('show_all_packages');
+});
+
+Route::prefix('admin')->namespace('admin')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+    Route::post('logout',[UserController::class,'logout'])->name('logout');
 });
