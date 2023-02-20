@@ -58,6 +58,6 @@ Route::prefix('admin/packages')->namespace('employeetype')->middleware(['auth:sa
     Route::get('show_all_packages',[\App\Http\Controllers\CommonAPI\PackageController::class,'index'])->name('show_all_packages');
 });
 
-Route::prefix('admin')->namespace('admin')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
-    Route::post('logout',[UserController::class,'logout'])->name('logout');
+Route::prefix('logout')->namespace('logout')->middleware(['auth:sanctum'])->group(function () {
+    Route::post('logout',[UserController::class,'allUsersLogout'])->name('logout');
 });
