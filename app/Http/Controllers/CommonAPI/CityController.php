@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CommonAPI;
 
 use App\Http\Controllers\Controller;
 use App\Models\City;
+use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -17,14 +18,14 @@ class CityController extends Controller
      */
     public function index()
     {
-        $role = City::where('country_id',\request()->countryId);
-        if(!empty($role)) {
+        $city = City::where('status','active')->get();
+        if(!empty($city)) {
             return response()->json(
                 [
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
-                    'data' => $role,
+                    'data' => $city,
                 ]);
         }else{
             return response()->json(
@@ -128,7 +129,7 @@ class CityController extends Controller
             "cityId" => "required|exist:cities,id",
             "name" => "nullable",
             "code" => "nullable",
-            "status" => "nullable|",
+            "status" => "required",
         ];
         $validator = Validator::make($request->all(), $validationRules);
         /*check is validation success*/
@@ -182,4 +183,32 @@ class CityController extends Controller
                 ]);
         }
     }
+
+    public function show_cities_by_country(Request $request){
+        $validationRules = [
+            'uuid' => 'required|uuid|exists:countries,uuid',
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constants.codes.validation'),
+                    'data' => [],
+                ]);
+        } else {
+            $cities = Country::with('city')->where('uuid',$request->uuid)->where('status','active')->first();
+            return response()->json(
+                [
+                    'status' => config('constant.messages.Success'),
+                    'message' => 'Cities data',
+                    'code' => config('constant.codes.success'),
+                    'data' => $cities
+                ]);
+        }
+    }
+
+
 }

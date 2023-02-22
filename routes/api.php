@@ -24,18 +24,17 @@ Route::prefix('company')->namespace('company')->middleware(['auth:sanctum','admi
     Route::post('block_unblock_company_account',[\App\Http\Controllers\Company\CompanyController::class,'block_unblock_company_account'])->name('block_unblock_company_account');
 });
 Route::prefix('admin/country')->namespace('country')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
-    Route::post('country_create',[\App\Http\Controllers\CommonAPI\CountryController::class,'store'])->name('company_create');
-    Route::post('update',[\App\Http\Controllers\CommonAPI\CountryController::class,'update'])->name('company_update');
-    Route::post('delete_country',[\App\Http\Controllers\CommonAPI\CountryController::class,'destroy'])->name('company_delete');
+    Route::post('country_create',[\App\Http\Controllers\CommonAPI\CountryController::class,'store'])->name('country_create');
+    Route::post('update_country',[\App\Http\Controllers\CommonAPI\CountryController::class,'update'])->name('update_country');
+    Route::post('delete_country',[\App\Http\Controllers\CommonAPI\CountryController::class,'destroy'])->name('delete_country');
+    Route::get('list_all_country',[\App\Http\Controllers\CommonAPI\CountryController::class,'index'])->name('list_all_country');
 });
 Route::prefix('admin/city')->namespace('city')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
-    Route::post('city_create',[\App\Http\Controllers\CommonAPI\CityController::class,'store'])->name('company_create');
-    Route::post('show_all',[\App\Http\Controllers\CommonAPI\CityController::class,'index'])->name('company_create');
-    Route::post('update',[\App\Http\Controllers\CommonAPI\CityController::class,'update'])->name('company_create');
-    Route::post('delete_city',[\App\Http\Controllers\CommonAPI\CityController::class,'destroy'])->name('company_create');
-});
-Route::prefix('Employee')->namespace('employee')->middleware(['auth:sanctum','company','check_status'])->group(function () {
-    Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create')->middleware(['limit_check']);
+    Route::post('create_city',[\App\Http\Controllers\CommonAPI\CityController::class,'store'])->name('create_city');
+    Route::get('show_all_city',[\App\Http\Controllers\CommonAPI\CityController::class,'index'])->name('show_all_city');
+    Route::post('update_city',[\App\Http\Controllers\CommonAPI\CityController::class,'update'])->name('update_city');
+    Route::post('delete_city',[\App\Http\Controllers\CommonAPI\CityController::class,'destroy'])->name('delete_city');
+    Route::post('show_cities_by_country',[\App\Http\Controllers\CommonAPI\CityController::class,'show_cities_by_country'])->name('show_cities_by_country');
 });
 
 Route::prefix('admin/role')->namespace('role')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
@@ -56,8 +55,21 @@ Route::prefix('admin/type')->namespace('employeetype')->middleware(['auth:sanctu
 Route::prefix('admin/packages')->namespace('employeetype')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
 //    PACKAGES ROUTES
     Route::get('show_all_packages',[\App\Http\Controllers\CommonAPI\PackageController::class,'index'])->name('show_all_packages');
+    Route::post('create_package',[\App\Http\Controllers\CommonAPI\PackageController::class,'store'])->name('create_package');
+    Route::post('update_package',[\App\Http\Controllers\CommonAPI\PackageController::class,'update'])->name('update_package');
+    Route::post('delete_package',[\App\Http\Controllers\CommonAPI\PackageController::class,'destroy'])->name('delete_package');
 });
 
-Route::prefix('logout')->namespace('logout')->middleware(['auth:sanctum'])->group(function () {
+Route::prefix('logout')->namespace('logout')->middleware(['auth:sanctum','check_status'])->group(function () {
     Route::post('logout',[UserController::class,'allUsersLogout'])->name('logout');
+});
+
+Route::prefix('employee')->namespace('employee')->middleware(['auth:sanctum','company','check_status'])->group(function () {
+    Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create')->middleware(['limit_check']);
+});
+Route::prefix('company/complain')->namespace('complain')->middleware(['auth:sanctum','company','check_status'])->group(function () {
+    Route::post('complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'store'])->name('complain_type');
+    Route::post('edit_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'update'])->name('edit_complain_type');
+    Route::get('list_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'index'])->name('list_complain_type');
+    Route::post('delete_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'destroy'])->name('delete_complain_type');
 });

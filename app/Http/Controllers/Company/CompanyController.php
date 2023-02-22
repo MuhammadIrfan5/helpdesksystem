@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use http\Client\Curl\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -54,7 +52,7 @@ class CompanyController extends Controller
             } else {
                 $company = Company::where('email', $request['email'])->first();
                 if (!empty($company)) {
-                    if($company->is_approved == 1 && strtolower($company->status) == 'active') {
+                    if ($company->is_approved == 1 && strtolower($company->status) == 'active') {
                         if (!Hash::check($request["password"], $company->password)) {
                             return response()->json(
                                 [
@@ -80,7 +78,7 @@ class CompanyController extends Controller
                                     'data' => $company,
                                 ]);
                         }
-                    }else{
+                    } else {
                         return response()->json(
                             [
                                 'success' => false,
@@ -193,7 +191,8 @@ class CompanyController extends Controller
         }
     }
 
-    public function block_unblock_company_account(Request $request){
+    public function block_unblock_company_account(Request $request)
+    {
         $validationRules = [
             'uuid' => 'required|uuid|exists:companies,uuid',
             'status' => 'required',
@@ -210,7 +209,7 @@ class CompanyController extends Controller
                 ]);
         } else {
             $company = Company::where('uuid', $request->uuid)->first();
-            if($company != null){
+            if ($company != null) {
                 $company->status = $request->status;
                 $company->update();
                 $company->touch();
@@ -218,11 +217,11 @@ class CompanyController extends Controller
                     [
                         'success' => true,
                         'status' => config('constant.messages.Success'),
-                        'message' => 'Company ' . (($request->status == 'active') ? 'Activated' : 'Inactived') .' Successfully',
+                        'message' => 'Company ' . (($request->status == 'active') ? 'Activated' : 'Inactived') . ' Successfully',
                         'code' => config('constant.codes.success'),
                         'data' => [],
                     ]);
-            }else{
+            } else {
                 return response()->json(
                     [
                         'success' => false,
@@ -234,7 +233,6 @@ class CompanyController extends Controller
             }
         }
     }
-
     /**
      * Display the specified resource.
      *

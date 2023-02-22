@@ -4,12 +4,11 @@ namespace App\Http\Controllers\CommonAPI;
 
 use App\Http\Controllers\Controller;
 use App\Models\ComplainType;
-use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class PackageController extends Controller
+class ComplainTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,21 +17,23 @@ class PackageController extends Controller
      */
     public function index()
     {
-        $packages = Package::where('status','active')->get();
-        if(!$packages->isEmpty()){
+        $complain_type = ComplainType::where('status','active')->get();
+        if($complain_type){
             return response()->json(
                 [
+                    'success' => true,
                     'status' => config('constant.messages.Success'),
-                    'message' => 'All record list',
+                    'message' => 'Complain type fetch successfully',
                     'code' => config('constant.codes.success'),
-                    'data' => $packages,
+                    'data' => $complain_type,
                 ]);
         }else{
             return response()->json(
                 [
+                    'success' => true,
                     'status' => config('constant.messages.Failure'),
-                    'message' => 'No roles found',
-                    'code' => config('constant.codes.Failure'),
+                    'message' => 'No data found',
+                    'code' => config('constant.codes.internalServer'),
                     'data' => [],
                 ]);
         }
@@ -57,10 +58,9 @@ class PackageController extends Controller
     public function store(Request $request)
     {
         $validationRules = [
-            'name' => 'required',
-            'slug' => 'required',
+            'type' => 'required',
+            'description' => 'nullable',
             'status' => 'required',
-            'package_cost' => 'numeric',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -73,28 +73,29 @@ class PackageController extends Controller
                     'data' => [],
                 ]);
         } else {
-            $package = Package::create([
+            $complain_type = ComplainType::create([
                 'uuid' => Str::uuid(),
-                'name' => $request->name,
-                'slug' => $request->slug,
-                'status' => $request->status,
-                'package_cost' => $request->package_cost,
+                'type' => $request->type,
+                'description' => $request->description,
+                'created_by' => auth()->user()->id,
+                'company_id' => auth()->user()->id,
+                'status' => $request->status
             ]);
-            if($package) {
+            if($complain_type) {
                 return response()->json(
                     [
                         'success' => true,
                         'status' => config('constant.messages.Success'),
-                        'message' => 'Data Enter Successfully',
+                        'message' => 'Complain type added successfully',
                         'code' => config('constant.codes.success'),
-                        'data' => [],
+                        'data' => $complain_type,
                     ]);
-            } else {
+            }else{
                 return response()->json(
                     [
-                        'success' => false,
+                        'success' => true,
                         'status' => config('constant.messages.Failure'),
-                        'message' => 'Something went wrong!',
+                        'message' => 'Something went wrong',
                         'code' => config('constant.codes.internalServer'),
                         'data' => [],
                     ]);
@@ -121,7 +122,7 @@ class PackageController extends Controller
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**
@@ -131,14 +132,13 @@ class PackageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $validationRules = [
-            'uuid' => 'required|exists:packages,uuid',
-            'name' => 'required',
-            'slug' => 'required',
+            'uuid' => 'required|uuid|exists:complain_type,uuid',
+            'type' => 'required',
+            'description' => 'nullable',
             'status' => 'required',
-            'package_cost' => 'numeric',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -151,26 +151,30 @@ class PackageController extends Controller
                     'data' => [],
                 ]);
         } else {
-            $package = Package::where('uuid',$request->uuid)->first();
-            $package->name = $request->name;
-            $package->slug = $request->slug;
-            $package->status = $request->status;
-            $package->package_cost = $request->package_cost;
-            if($package->update()) {
+
+            $complain_type = ComplainType::where('uuid',$request->uuid)->where('company_id',auth()->user()->id)->first();
+            if($complain_type) {
+                $complain_type->uuid = auth()->user()->uuid;
+                $complain_type->type = $request->type;
+                $complain_type->description = $request->description;
+                $complain_type->created_by = auth()->user()->id;
+                $complain_type->company_id = auth()->user()->id;
+                $complain_type->status = $request->status;
+                $complain_type->update();
                 return response()->json(
                     [
                         'success' => true,
                         'status' => config('constant.messages.Success'),
-                        'message' => 'Data Updated Successfully',
+                        'message' => 'Complain type edited successfully',
                         'code' => config('constant.codes.success'),
-                        'data' => [],
+                        'data' => $complain_type,
                     ]);
-            } else {
+            }else{
                 return response()->json(
                     [
-                        'success' => false,
+                        'success' => true,
                         'status' => config('constant.messages.Failure'),
-                        'message' => 'Something went wrong!',
+                        'message' => 'Something went wrong',
                         'code' => config('constant.codes.internalServer'),
                         'data' => [],
                     ]);
@@ -187,7 +191,7 @@ class PackageController extends Controller
     public function destroy(Request $request)
     {
         $validationRules = [
-            'uuid' => 'required|exists:packages,uuid'
+            'uuid' => 'required|uuid|exists:complain_type,uuid',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -200,13 +204,13 @@ class PackageController extends Controller
                     'data' => [],
                 ]);
         } else {
-            $package = Package::where('uuid',$request->uuid)->delete();
-            if($package) {
+            $complain_type = ComplainType::where('uuid',$request->uuid)->where('company_id',auth()->user()->id)->delete();
+            if($complain_type) {
                 return response()->json(
                     [
                         'success' => true,
                         'status' => config('constant.messages.Success'),
-                        'message' => 'Data Updated Successfully',
+                        'message' => 'Complain delete successfully',
                         'code' => config('constant.codes.success'),
                         'data' => [],
                     ]);

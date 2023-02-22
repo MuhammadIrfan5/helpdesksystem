@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\URL;
         return $reg_no;
     }
 
-    function count_company_engineer($company_id){
+    function count_company_user($company_id){
         $employee = array();
         $employee['engineer'] = \App\Models\Employee::where('company_id',$company_id)->where('role_id',4)->count();
         $employee['employee'] = \App\Models\Employee::where('company_id',$company_id)->where('role_id',5)->count();

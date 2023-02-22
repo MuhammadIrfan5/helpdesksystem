@@ -17,14 +17,14 @@ class CountryController extends Controller
      */
     public function index()
     {
-        $role = Country::all();
-        if(!empty($role)) {
+        $country = Country::where('status','active')->get();
+        if(!empty($country)) {
             return response()->json(
                 [
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
-                    'data' => $role,
+                    'data' => $country,
                 ]);
         }else{
             return response()->json(

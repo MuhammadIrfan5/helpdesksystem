@@ -16,9 +16,8 @@ class CheckEmployeeLimit
      */
     public function handle(Request $request, Closure $next)
     {
-//        dd(count_company_engineer(auth()->user()->id)['engineer']);
         if(get_role_data_by_id($request->role_id)['slug'] == 'engineer'){
-            if(count_company_engineer(auth()->user()->id)['engineer'] < auth()->user()->engineer_limit){
+            if(count_company_user(auth()->user()->id)['engineer'] < auth()->user()->engineer_limit){
                 return $next($request);
             }else{
                 return response()->json(
@@ -32,7 +31,7 @@ class CheckEmployeeLimit
             }
         }
         if(get_role_data_by_id($request->role_id)['slug'] == 'employee'){
-            if(count_company_engineer(auth()->user()->id)['employee'] < auth()->user()->employee_limit){
+            if(count_company_user(auth()->user()->id)['employee'] < auth()->user()->employee_limit){
                 return $next($request);
             }else{
                 return response()->json(
