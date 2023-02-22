@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CommonAPI;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -17,7 +18,11 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $role = Role::where('status','active')->get();
+        if(Auth::guard('users')->check()){
+            $role = Role::where('status','active')->get();
+        }elseif (Auth::guard('company')->check()){
+            $role = Role::where('status','active')->whereNotIn('slug',['admin','super-admin','company'])->get();
+        }
         if(!empty($role)) {
             return response()->json(
                 [
@@ -107,6 +112,7 @@ class RoleController extends Controller
             }
         }
     }
+
 
     /**
      * Display the specified resource.
