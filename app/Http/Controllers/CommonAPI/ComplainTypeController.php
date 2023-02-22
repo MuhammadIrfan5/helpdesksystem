@@ -30,10 +30,10 @@ class ComplainTypeController extends Controller
         }else{
             return response()->json(
                 [
-                    'success' => true,
+                    'success' => false,
                     'status' => config('constant.messages.Failure'),
                     'message' => 'No data found',
-                    'code' => config('constant.codes.internalServer'),
+                    'code' => config('constant.codes.notFound'),
                     'data' => [],
                 ]);
         }

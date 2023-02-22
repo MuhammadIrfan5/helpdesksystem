@@ -101,7 +101,7 @@ class EmployeeTypeController extends Controller
                     [
                         'status' => config('constant.messages.Failure'),
                         'message' => $e,
-                        'code' => config('constant.codes.internalServer'),
+                        'code' => config('constant.codes.notFound'),
                         'data' => [],
                     ]);
             }
@@ -195,7 +195,7 @@ class EmployeeTypeController extends Controller
                     [
                         'status' => config('constant.messages.Failure'),
                         'message' => $e,
-                        'code' => config('constant.codes.internalServer'),
+                        'code' => config('constant.codes.badRequest'),
                         'data' => [],
                     ]);
             }
