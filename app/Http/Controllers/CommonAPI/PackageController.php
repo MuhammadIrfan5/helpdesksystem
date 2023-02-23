@@ -18,7 +18,7 @@ class PackageController extends Controller
      */
     public function index()
     {
-        $packages = Package::where('status','active')->get();
+        $packages = Package::where('status','active')->paginate(2);
         if(!$packages->isEmpty()){
             return response()->json(
                 [
@@ -31,7 +31,7 @@ class PackageController extends Controller
             return response()->json(
                 [
                     'status' => config('constant.messages.Failure'),
-                    'message' => 'No roles found',
+                    'message' => 'No packages found',
                     'code' => config('constant.codes.Failure'),
                     'data' => [],
                 ]);

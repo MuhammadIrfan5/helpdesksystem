@@ -18,7 +18,26 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        //
+        $companies = Company::all();
+        if(!empty($companies)){
+            return response()->json(
+                [
+                    'success' => true,
+                    'status' => config('constant.messages.loginSuccess'),
+                    'message' => 'all companies',
+                    'code' => config('constant.codes.success'),
+                    'data' => $companies,
+                ]);
+        }else{
+            return response()->json(
+                [
+                    'success' => true,
+                    'status' => config('constant.messages.notFound'),
+                    'message' => 'No companies',
+                    'code' => config('constant.codes.notFound'),
+                    'data' => [],
+                ]);
+        }
     }
 
     /**
@@ -252,6 +271,7 @@ class CompanyController extends Controller
             }
         }
     }
+
     /**
      * Display the specified resource.
      *

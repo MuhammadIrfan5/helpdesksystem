@@ -22,6 +22,7 @@ Route::post('employee_login',[\App\Http\Controllers\Company\EmployeeController::
 Route::prefix('company')->namespace('company')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('company_create',[\App\Http\Controllers\Company\CompanyController::class,'store'])->name('company_create');
     Route::post('block_unblock_company_account',[\App\Http\Controllers\Company\CompanyController::class,'block_unblock_company_account'])->name('block_unblock_company_account');
+    Route::get('show_all_companies',[\App\Http\Controllers\Company\CompanyController::class,'index'])->name('show_all_companies');
 });
 Route::prefix('admin/country')->namespace('country')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('country_create',[\App\Http\Controllers\CommonAPI\CountryController::class,'store'])->name('country_create');
