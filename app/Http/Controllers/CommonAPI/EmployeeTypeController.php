@@ -21,6 +21,7 @@ class EmployeeTypeController extends Controller
         if(!empty($type)) {
             return response()->json(
                 [
+                    'success' => true,
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
@@ -29,6 +30,7 @@ class EmployeeTypeController extends Controller
         }else{
             return response()->json(
                 [
+                    'success' => false,
                     'status' => config('constant.messages.Failure'),
                     'message' => 'No employee type found',
                     'code' => config('constant.codes.badRequest'),
@@ -64,6 +66,7 @@ class EmployeeTypeController extends Controller
         if ($validator->fails()) {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => 'Validation Errors' ,
                     'message' => $validator->errors()->first(),
                     'code' => config('constant.codes.validation'),
@@ -81,6 +84,7 @@ class EmployeeTypeController extends Controller
                 if($type){
                     return response()->json(
                         [
+                            'success' => true,
                             'status' => config('constant.messages.Success'),
                             'message' => 'Record created successfully',
                             'code' => config('constant.codes.success'),
@@ -89,6 +93,7 @@ class EmployeeTypeController extends Controller
                 }else{
                     return response()->json(
                         [
+                            'success' => false,
                             'status' => config('constant.messages.Failure'),
                             'message' => 'Data not created',
                             'code' => config('constant.codes.badRequest'),
@@ -99,6 +104,7 @@ class EmployeeTypeController extends Controller
                 dd('here');
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => config('constant.messages.Failure'),
                         'message' => $e,
                         'code' => config('constant.codes.notFound'),
@@ -149,6 +155,7 @@ class EmployeeTypeController extends Controller
         if ($validator->fails()) {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => 'Validation Errors',
                     'message' => $validator->errors()->first(),
                     'code' => config('constant.codes.validation'),
@@ -167,6 +174,7 @@ class EmployeeTypeController extends Controller
                     if ($type) {
                         return response()->json(
                             [
+                                'success' => true,
                                 'status' => config('constant.messages.Success'),
                                 'message' => 'Record updated successfully',
                                 'code' => config('constant.codes.success'),
@@ -175,6 +183,7 @@ class EmployeeTypeController extends Controller
                     } else {
                         return response()->json(
                             [
+                                'success' => false,
                                 'status' => config('constant.messages.Failure'),
                                 'message' => 'Data not updated',
                                 'code' => config('constant.codes.badRequest'),
@@ -184,6 +193,7 @@ class EmployeeTypeController extends Controller
                 } else {
                     return response()->json(
                         [
+                            'success' => false,
                             'status' => config('constant.messages.notFound'),
                             'message' => 'Data not found',
                             'code' => config('constant.codes.notFound'),
@@ -193,6 +203,7 @@ class EmployeeTypeController extends Controller
             } catch (\Exception $e) {
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => config('constant.messages.Failure'),
                         'message' => $e,
                         'code' => config('constant.codes.badRequest'),

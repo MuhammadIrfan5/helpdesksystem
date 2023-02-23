@@ -22,6 +22,7 @@ class CityController extends Controller
         if(!empty($city)) {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
@@ -30,6 +31,7 @@ class CityController extends Controller
         }else{
             return response()->json(
                 [
+                    'success' => true,
                     'status' => config('constant.messages.Failure'),
                     'message' => 'No roles found',
                     'code' => config('constant.codes.badRequest'),
@@ -117,7 +119,7 @@ class CityController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         /*Response format*/
         $response = [
@@ -126,7 +128,8 @@ class CityController extends Controller
         ];
         /*validation*/
         $validationRules = [
-            "cityId" => "required|exist:cities,id",
+            "city_uuid" => "required|exists:cities,uuid",
+            "country_uuid" => "exists:countries,uuid",
             "name" => "nullable",
             "code" => "nullable",
             "status" => "required",
@@ -134,25 +137,49 @@ class CityController extends Controller
         $validator = Validator::make($request->all(), $validationRules);
         /*check is validation success*/
         if ($validator->fails()) {
-            $response["message"] = $validator->errors()->first();
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors' ,
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constant.codes.validation'),
+                    'data' => [],
+                ]);
         } else {
             /*update city*/
-            $result = City::where('uuid', $request->cityId)->first();
-            if (!empty($request->phone)) {
+            $result = City::where('uuid', $request->city_uuid)->first();
+            if (!empty($request->country_uuid)) {
+                $result->country_id = Country::select('id')->where('uuid',$request->country_uuid)->first()['id'];
+            }
+            if (!empty($request->name)) {
                 $result->name = $request->name;
             }
-            if (!empty($request->phone)) {
+            if (!empty($request->code)) {
                 $result->code = $request->code;
             }
-            if (!empty($request->phone)) {
+            if (!empty($request->status)) {
                 $result->status = $request->status;
             }
-            $result->update();
-            /*make response*/
-            $response["success"] = true;
-            $response["message"] = "Application Submitted!";
+            if($result->update()) {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Record updated successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => $result,
+                    ]);
+            }else{
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Data not updated',
+                        'code' => config('constant.codes.badRequest'),
+                        'data' => [],
+                    ]);
+            }
         }
-        return response($response);
     }
 
     /**

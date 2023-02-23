@@ -74,6 +74,7 @@ class CompanyController extends Controller
                             $response['status'] = config('constant.messages.loginSuccess');
                             $response['message'] ='Logged In';
                             $response['code'] = config('constant.codes.success');
+                            $response['data']['uuid'] = $company->uuid;
                             $response['data']['name'] = $company->name;
                             $response['data']['email'] = $company->email;
                             $response['data']['phone'] = $company->phone_no;

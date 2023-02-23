@@ -128,6 +128,7 @@ class UserController extends Controller
                         $response['status'] = config('constant.messages.loginSuccess');
                         $response['message'] ='Logged In';
                         $response['code'] = config('constant.codes.success');
+                        $response['data']['uuid'] = $user->uuid;
                         $response['data']['name'] = $user->first_name . $user->last_name;
                         $response['data']['email'] = $user->email;
                         $response['data']['phone'] = $user->phone;

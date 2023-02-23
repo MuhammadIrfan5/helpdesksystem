@@ -69,6 +69,7 @@ class RoleController extends Controller
         if ($validator->fails()) {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => 'Validation Errors' ,
                     'message' => $validator->errors()->first(),
                     'code' => config('constant.codes.validation'),
@@ -87,6 +88,7 @@ class RoleController extends Controller
                 if($role){
                     return response()->json(
                         [
+                            'success' => true,
                             'status' => config('constant.messages.Success'),
                             'message' => 'Record created successfully',
                             'code' => config('constant.codes.success'),
@@ -95,6 +97,7 @@ class RoleController extends Controller
                 }else{
                     return response()->json(
                         [
+                            'success' => false,
                             'status' => config('constant.messages.Failure'),
                             'message' => 'Data not created',
                             'code' => config('constant.codes.badRequest'),
@@ -104,6 +107,7 @@ class RoleController extends Controller
             }catch (\Exception $e){
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => config('constant.messages.Failure'),
                         'message' => $e,
                         'code' => config('constant.codes.internalServer'),
@@ -155,6 +159,7 @@ class RoleController extends Controller
         if ($validator->fails()) {
             return response()->json(
                 [
+                    'success' => false,
                     'status' => 'Validation Errors' ,
                     'message' => $validator->errors()->first(),
                     'code' => config('constant.codes.validation'),
@@ -172,6 +177,7 @@ class RoleController extends Controller
                     if ($role) {
                         return response()->json(
                             [
+                                'success' => true,
                                 'status' => config('constant.messages.Success'),
                                 'message' => 'Record updated successfully',
                                 'code' => config('constant.codes.success'),
@@ -180,6 +186,7 @@ class RoleController extends Controller
                     } else {
                         return response()->json(
                             [
+                                'success' => false,
                                 'status' => config('constant.messages.Failure'),
                                 'message' => 'Data not updated',
                                 'code' => config('constant.codes.badRequest'),
@@ -189,6 +196,7 @@ class RoleController extends Controller
                 }else{
                     return response()->json(
                         [
+                            'success' => false,
                             'status' => config('constant.messages.notFound'),
                             'message' => 'Data not found',
                             'code' => config('constant.codes.notFound'),
@@ -198,6 +206,7 @@ class RoleController extends Controller
             }catch (\Exception $e){
                 return response()->json(
                     [
+                        'success' => false,
                         'status' => config('constant.messages.Failure'),
                         'message' => $e,
                         'code' => config('constant.codes.internalServer'),
@@ -220,6 +229,7 @@ class RoleController extends Controller
             $role->delete();
             return response()->json(
                 [
+                    'success' => true,
                     'status' => config('constant.messages.Success'),
                     'message' => 'Record deleted successfully',
                     'code' => config('constant.codes.success'),
@@ -228,6 +238,7 @@ class RoleController extends Controller
         }else{
             return response()->json(
                 [
+                    'success' => false,
                     'status' => config('constant.messages.Failure'),
                     'message' => 'Record not delete',
                     'code' => config('constant.codes.badRequest'),

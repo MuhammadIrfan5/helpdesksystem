@@ -75,6 +75,7 @@ class EmployeeController extends Controller
                                 $response['status'] = config('constant.messages.loginSuccess');
                                 $response['message'] ='Logged In';
                                 $response['code'] = config('constant.codes.success');
+                                $response['data']['uuid'] = $employee->uuid;
                                 $response['data']['name'] = $employee->first_name . $employee->last_name;
                                 $response['data']['employee_code'] = $employee->employee_code;
                                 $response['data']['email'] = $employee->company_email;

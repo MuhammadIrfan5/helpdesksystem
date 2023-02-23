@@ -31,7 +31,6 @@ Route::prefix('admin/country')->namespace('country')->middleware(['auth:sanctum'
 });
 Route::prefix('admin/city')->namespace('city')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('create_city',[\App\Http\Controllers\CommonAPI\CityController::class,'store'])->name('create_city');
-
     Route::post('update_city',[\App\Http\Controllers\CommonAPI\CityController::class,'update'])->name('update_city');
     Route::post('delete_city',[\App\Http\Controllers\CommonAPI\CityController::class,'destroy'])->name('delete_city');
 
