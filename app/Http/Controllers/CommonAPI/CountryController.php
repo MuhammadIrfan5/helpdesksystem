@@ -55,12 +55,6 @@ class CountryController extends Controller
      */
     public function store(Request $request)
     {
-        /*Response format*/
-        $response = [
-            "success" => false,
-            "message" => ""
-        ];
-        /*validation*/
         $validationRules = [
             "phone" => "required|min:11|numeric",
             "code" => "required",
@@ -74,7 +68,14 @@ class CountryController extends Controller
         $validator = Validator::make($request->all(), $validationRules);
         /*check is validation success*/
         if ($validator->fails()) {
-            $response["message"] = $validator->errors()->first();
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constants.codes.validation'),
+                    'data' => [],
+                ]);
         } else {
             /*create user*/
             $apply = [
@@ -91,11 +92,26 @@ class CountryController extends Controller
 
             ];
             $save = Country::create($apply);
-            /*make response*/
-            $response["success"] = true;
-            $response["message"] = "Application Submitted!";
+            if($save){
+                return response()->json(
+                [
+                    'success' => true,
+                    'status' => config('constant.messages.Success'),
+                    'message' => 'Data Created Successfully',
+                    'code' => config('constant.codes.success'),
+                    'data' => [],
+                ]);
+            }else{
+                return response()->json(
+                [
+                    'success' => false,
+                    'status' => config('constant.messages.Failure'),
+                    'message' => 'Something went wrong!',
+                    'code' => config('constant.codes.internalServer'),
+                    'data' => [],
+                ]);
+            }
         }
-        return response($response);
     }
 
     /**

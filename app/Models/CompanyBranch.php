@@ -14,7 +14,6 @@ class CompanyBranch extends Model
         'id'
     ];
 
-
     protected function branchName(): Attribute
     {
         return Attribute::make(

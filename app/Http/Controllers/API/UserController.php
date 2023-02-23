@@ -104,6 +104,7 @@ class UserController extends Controller
                     ]);
 
             } else {
+                $response = array();
                 $user = User::Where('email', $request['email'])->first();
                 if (!empty($user) && ($user->role->slug === 'admin' || $user->role->slug === 'super-admin')) {
                     if (!$user || !Hash::check($request["password"], $user->password)) {
@@ -123,14 +124,19 @@ class UserController extends Controller
                         $user->remember_token = $token;
                         $user->save();
                         $user->usertoken = $token;
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'status' => config('constant.messages.loginSuccess'),
-                                'message' => 'Logged In',
-                                'code' => config('constant.codes.success'),
-                                'data' => $user,
-                            ]);
+                        $response['success'] = true;
+                        $response['status'] = config('constant.messages.loginSuccess');
+                        $response['message'] ='Logged In';
+                        $response['code'] = config('constant.codes.success');
+                        $response['data']['name'] = $user->first_name . $user->last_name;
+                        $response['data']['email'] = $user->email;
+                        $response['data']['phone'] = $user->phone;
+                        $response['data']['address'] = $user->address;
+                        $response['data']['token'] = $user->usertoken;
+                        $response['data']['role'] = $user->role;
+                        $response['data']['country'] = $user->country;
+                        $response['data']['city'] = $user->city;
+                        return response($response, 200);
                     }
                 } else {
                     return response()->json(

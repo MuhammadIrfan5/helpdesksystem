@@ -50,6 +50,7 @@ class EmployeeController extends Controller
                     ]);
 
             } else {
+                $response = array();
                 $employee = Employee::where('company_email', $request['email'])->first();
                 if (!empty($employee)) {
                     if($employee->company->is_approved == 1 && strtolower($employee->company->status) == 'active') {
@@ -70,14 +71,23 @@ class EmployeeController extends Controller
                                 $token = $employee->createToken('employeeToken')->plainTextToken;
                                 $employee->save();
                                 $employee->employeeToken = $token;
-                                return response()->json(
-                                    [
-                                        'success' => true,
-                                        'status' => config('constant.messages.loginSuccess'),
-                                        'message' => 'Logged In',
-                                        'code' => config('constant.codes.success'),
-                                        'data' => $employee,
-                                    ]);
+                                $response['success'] = true;
+                                $response['status'] = config('constant.messages.loginSuccess');
+                                $response['message'] ='Logged In';
+                                $response['code'] = config('constant.codes.success');
+                                $response['data']['name'] = $employee->first_name . $employee->last_name;
+                                $response['data']['employee_code'] = $employee->employee_code;
+                                $response['data']['email'] = $employee->company_email;
+                                $response['data']['phone'] = $employee->primary_phone_no;
+                                $response['data']['address'] = $employee->address_line1;
+                                $response['data']['token'] = $employee->employeeToken;
+                                $response['data']['role'] = $employee->role;
+                                $response['data']['emp_type'] = $employee->employee_type;
+                                $response['data']['company'] = $employee->company;
+                                $response['data']['country'] = $employee->country;
+                                $response['data']['city'] = $employee->city;
+                                $response['data']['branch'] = $employee->branch;
+                                return response($response, 200);
                             }
                         } else {
                             return response()->json(

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\CommonAPI;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\CompanyComplainType;
 use App\Models\ComplainType;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ComplainTypeController extends Controller
 {
@@ -226,4 +230,58 @@ class ComplainTypeController extends Controller
             }
         }
     }
+
+    public function assign_complain_type_engineer(Request $request){
+        $validationRules = [
+            'complain_type_uuid' => 'required|uuid|exists:complain_type,uuid',
+            'company_uuid' => 'required|uuid|exists:companies,uuid',
+            'employee_uuid' => 'required|uuid|exists:employee,uuid',
+            'employee_uuid' => Rule::prohibitedIf(fn () => Employee::with('role')->where('uuid',$request->employee_uuid)->first()->role->slug != 'engineer'),
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constants.codes.validation'),
+                    'data' => [],
+                ]);
+        } else {
+            $complain_type = ComplainType::where('uuid',$request->complain_type_uuid)->first();
+            $company = Company::where('uuid',$request->company_uuid)->first();
+            $engineer = Employee::with('role')->where('uuid',$request->employee_uuid)->first();
+
+            $assign = CompanyComplainType::create(
+                [
+                    'uuid' => Str::uuid(),
+                    'company_id' => $company->id,
+                    'complain_type_id' => $complain_type->id,
+                    'employee_id' => $engineer->id,
+                    'employee_role_id' => $engineer->role->id
+                ]
+            );
+            if($assign) {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Complaint Type Assign Successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => [],
+                    ]);
+            } else {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Something went wrong!',
+                        'code' => config('constant.codes.internalServer'),
+                        'data' => [],
+                    ]);
+            }
+        }
+    }
+
 }

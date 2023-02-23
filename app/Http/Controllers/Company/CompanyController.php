@@ -50,6 +50,7 @@ class CompanyController extends Controller
                     ]);
 
             } else {
+                $response = array();
                 $company = Company::where('email', $request['email'])->first();
                 if (!empty($company)) {
                     if ($company->is_approved == 1 && strtolower($company->status) == 'active') {
@@ -69,14 +70,31 @@ class CompanyController extends Controller
                             $token = $company->createToken('companyToken')->plainTextToken;
                             $company->save();
                             $company->companyToken = $token;
-                            return response()->json(
-                                [
-                                    'success' => true,
-                                    'status' => config('constant.messages.loginSuccess'),
-                                    'message' => 'Logged In',
-                                    'code' => config('constant.codes.success'),
-                                    'data' => $company,
-                                ]);
+                            $response['success'] = true;
+                            $response['status'] = config('constant.messages.loginSuccess');
+                            $response['message'] ='Logged In';
+                            $response['code'] = config('constant.codes.success');
+                            $response['data']['name'] = $company->name;
+                            $response['data']['email'] = $company->email;
+                            $response['data']['phone'] = $company->phone_no;
+                            $response['data']['address'] = $company->address;
+                            $response['data']['token'] = $company->companyToken;
+                            $response['data']['key'] = $company->company_key;
+                            $response['data']['registration'] = $company->registration_no;
+                            $response['data']['status'] = $company->status;
+                            $response['data']['role'] = $company->role;
+                            $response['data']['country'] = $company->country;
+                            $response['data']['city'] = $company->city;
+                            $response['data']['package'] = $company->package;
+                            return response($response, 200);
+//                            return response()->json(
+//                                [
+//                                    'success' => true,
+//                                    'status' => config('constant.messages.loginSuccess'),
+//                                    'message' => 'Logged In',
+//                                    'code' => config('constant.codes.success'),
+//                                    'data' => $company,
+//                                ]);
                         }
                     } else {
                         return response()->json(
@@ -132,8 +150,8 @@ class CompanyController extends Controller
             'longitude' => 'required|string',
             'is_approved' => 'required',
             'address' => 'required',
-            'engineer_limit' => 'required',
-            'employee_limit' => 'required',
+            'engineer_limit' => 'required|numeric',
+            'employee_limit' => 'required|numeric',
             'status' => 'required,enum:[active,inactive]',
         ];
         $validator = Validator::make($request->all(), $validationRules);

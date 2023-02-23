@@ -70,6 +70,7 @@ Route::prefix('company/complain')->namespace('complain')->middleware(['auth:sanc
     Route::post('edit_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'update'])->name('edit_complain_type');
     Route::get('list_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'index'])->name('list_complain_type');
     Route::post('delete_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'destroy'])->name('delete_complain_type');
+    Route::post('assign_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'assign_complain_type_engineer'])->name('assign_complain_type');
 });
 
 Route::prefix('general/listing')->namespace('listing')->middleware(['auth:sanctum'])->group(function () {

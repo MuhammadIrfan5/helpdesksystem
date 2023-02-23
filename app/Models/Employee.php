@@ -43,7 +43,8 @@ class Employee extends Authenticatable
         'country:id,uuid,name,code',
         'city:id,uuid,name,code,country_id',
         'company:id,uuid,name,email,package_id,country_id,city_id,role_id,user_created_by,status,is_approved',
-        'employee_type:id,uuid,type'
+        'employee_type:id,uuid,type',
+        'branch:id,uuid,is_main_branch,branch_name,email,status',
     ];
 
     /**
@@ -73,6 +74,10 @@ class Employee extends Authenticatable
 
     public function employee_type(){
         return $this->belongsTo(EmployeeType::class);
+    }
+
+    public function branch(){
+        return $this->belongsTo(CompanyBranch::class);
     }
 
     protected function firstName(): Attribute
