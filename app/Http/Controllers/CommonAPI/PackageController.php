@@ -22,6 +22,7 @@ class PackageController extends Controller
         if(!$packages->isEmpty()){
             return response()->json(
                 [
+                    'success' => true,
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
@@ -30,6 +31,7 @@ class PackageController extends Controller
         }else{
             return response()->json(
                 [
+                    'success' => false,
                     'status' => config('constant.messages.Failure'),
                     'message' => 'No packages found',
                     'code' => config('constant.codes.Failure'),

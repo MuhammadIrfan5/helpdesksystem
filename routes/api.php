@@ -81,4 +81,5 @@ Route::prefix('general/listing')->namespace('listing')->middleware(['auth:sanctu
     Route::get('show_all_packages',[\App\Http\Controllers\CommonAPI\PackageController::class,'index'])->name('show_all_packages');
     Route::get('show_all_roles', [\App\Http\Controllers\CommonAPI\RoleController::class, 'index'])->name('show_all');
     Route::get('show_branch_by_company', [\App\Http\Controllers\Company\BranchController::class, 'show_branch_by_company'])->name('show_branch_by_company');
+    Route::get('dashborad_analytics', [\App\Http\Controllers\CommonAPI\DashboradController::class, 'dashborad_analytics'])->name('dashborad_analytics');
 });

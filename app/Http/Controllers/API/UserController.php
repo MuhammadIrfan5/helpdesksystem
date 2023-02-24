@@ -134,9 +134,16 @@ class UserController extends Controller
                         $response['data']['phone'] = $user->phone;
                         $response['data']['address'] = $user->address;
                         $response['data']['token'] = $user->usertoken;
+                        $response['data']['key'] = null;
+                        $response['data']['status'] = null;
+                        $response['data']['registration'] = null;
                         $response['data']['role'] = $user->role;
                         $response['data']['country'] = $user->country;
                         $response['data']['city'] = $user->city;
+                        $response['data']['package'] = null;
+                        $response['data']['branch'] = null;
+                        $response['data']['emp_type'] = null;
+                        $response['data']['company'] = null;
                         return response($response, 200);
                     }
                 } else {

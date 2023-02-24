@@ -80,12 +80,16 @@ class EmployeeController extends Controller
                                 $response['data']['phone'] = $employee->primary_phone_no;
                                 $response['data']['address'] = $employee->address_line1;
                                 $response['data']['token'] = $employee->employeeToken;
+                                $response['data']['key'] = null;
+                                $response['data']['registration'] = null;
+                                $response['data']['status'] = $employee->status;
                                 $response['data']['role'] = $employee->role;
-                                $response['data']['emp_type'] = $employee->employee_type;
-                                $response['data']['company'] = $employee->company;
                                 $response['data']['country'] = $employee->country;
                                 $response['data']['city'] = $employee->city;
+                                $response['data']['package'] = null;
                                 $response['data']['branch'] = $employee->branch;
+                                $response['data']['emp_type'] = $employee->employee_type;
+                                $response['data']['company'] = $employee->company;
                                 return response($response, 200);
                             }
                         } else {

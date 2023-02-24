@@ -106,6 +106,9 @@ class CompanyController extends Controller
                             $response['data']['country'] = $company->country;
                             $response['data']['city'] = $company->city;
                             $response['data']['package'] = $company->package;
+                            $response['data']['branch'] = null;
+                            $response['data']['emp_type'] = null;
+                            $response['data']['company'] = null;
                             return response($response, 200);
 //                            return response()->json(
 //                                [
