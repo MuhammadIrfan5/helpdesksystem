@@ -226,7 +226,18 @@ class CityController extends Controller
                     'data' => [],
                 ]);
         } else {
-            $cities = Country::with('city')->where('uuid',$request->uuid)->where('status','active')->first();
+            $cities = Country::with('city')->where('uuid',$request->uuid)->where('status','active')->get();
+//            $response['success'] = true;
+//            $data = array();
+//            foreach ($cities as $city->city){
+//                var_dump($city->city);
+//            }
+//            die();
+//            $response['status'] = config('constant.messages.Success');
+//            $response['message'] = "All record list";
+//            $response['code'] = config('constant.codes.success');
+//            $response['data'] = $data;
+//            return response($response, 200);
             return response()->json(
                 [
                     'status' => config('constant.messages.Success'),

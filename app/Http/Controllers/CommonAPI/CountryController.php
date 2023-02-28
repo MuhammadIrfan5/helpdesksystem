@@ -17,20 +17,32 @@ class CountryController extends Controller
      */
     public function index()
     {
-        $country = Country::where('status','active')->get();
-        if(!empty($country)) {
-            return response()->json(
-                [
-                    'status' => config('constant.messages.Success'),
-                    'message' => 'All record list',
-                    'code' => config('constant.codes.success'),
-                    'data' => $country,
-                ]);
+        $countries = Country::where('status','active')->get();
+        if(!empty($countries)) {
+            $response['success'] = true;
+            $data = array();
+            foreach ($countries as $country){
+                $data['uuid'] = $country->uuid;
+                $data['value'] = $country->code;
+                $data['label'] = $country->name;
+            }
+            $response['status'] = config('constant.messages.Success');
+            $response['message'] = "All record list";
+            $response['code'] = config('constant.codes.success');
+            $response['data'] = $data;
+            return response($response, 200);
+//            return response()->json(
+//                [
+//                    'status' => config('constant.messages.Success'),
+//                    'message' => 'All record list',
+//                    'code' => config('constant.codes.success'),
+//                    'data' => $country,
+//                ]);
         }else{
             return response()->json(
                 [
                     'status' => config('constant.messages.Failure'),
-                    'message' => 'No roles found',
+                    'message' => 'No Data found',
                     'code' => config('constant.codes.badRequest'),
                     'data' => [],
                 ]);
