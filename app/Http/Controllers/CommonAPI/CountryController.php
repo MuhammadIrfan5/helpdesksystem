@@ -29,7 +29,7 @@ class CountryController extends Controller
             $response['status'] = config('constant.messages.Success');
             $response['message'] = "All record list";
             $response['code'] = config('constant.codes.success');
-            $response['data'] = $data;
+            $response['data'] = [$data];
             return response($response, 200);
 //            return response()->json(
 //                [
