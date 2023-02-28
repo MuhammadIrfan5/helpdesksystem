@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
 use App\Models\Company;
+use App\Models\Country;
+use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -163,9 +166,9 @@ class CompanyController extends Controller
     {
         $validationRules = [
 //            'user_created_by' => 'required|string',
-            'country_id' => 'required|string',
-            'city_id' => 'required|string',
-            'package_id' => 'required|string',
+            'country_id' => 'required|exists:countries,uuid',
+            'city_id' => 'required|exists:cities,uuid',
+            'package_id' => 'required|exists:packages,uuid',
             'name' => 'required|string|min:3',
             'email' => 'required|email|unique:companies,email',
             'phone_no' => 'required|string|min:11|max:12',
@@ -175,7 +178,7 @@ class CompanyController extends Controller
             'address' => 'required',
             'engineer_limit' => 'required|numeric',
             'employee_limit' => 'required|numeric',
-            'status' => 'required,enum:[active,inactive]',
+            'status' => 'required|string',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -191,9 +194,9 @@ class CompanyController extends Controller
             $data = [
                 'uuid' => Str::uuid(),
                 'user_created_by' => auth()->user()->id,
-                'country_id' => $request->country_id,
-                'city_id' => $request->city_id,
-                'package_id' => $request->package_id,
+                'country_id' => Country::where('uuid',$request->country_id)->first()['id'],
+                'city_id' => City::where('uuid',$request->city_id)->first()['id'],
+                'package_id' => Package::where('uuid',$request->package_id)->first()['id'],
                 'role_id' => 3,
                 'registration_no' => generate_registaion_no(),
                 'name' => $request->name,
