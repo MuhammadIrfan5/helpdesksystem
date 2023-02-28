@@ -18,8 +18,12 @@ class PackageController extends Controller
      */
     public function index()
     {
-        $packages = Package::where('status','active')->paginate(2);
+        $packages = Package::where('status','active')->get();
         if(!$packages->isEmpty()){
+            foreach ($packages as $package){
+                $package->label = $package->name;
+                $package->value = $package->slug;
+            }
             return response()->json(
                 [
                     'success' => true,

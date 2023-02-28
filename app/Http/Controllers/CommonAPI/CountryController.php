@@ -19,28 +19,22 @@ class CountryController extends Controller
     {
         $countries = Country::where('status','active')->get();
         if(!empty($countries)) {
-            $response['success'] = true;
-            $data = array();
             foreach ($countries as $country){
-                $data['uuid'] = $country->uuid;
-                $data['value'] = $country->code;
-                $data['label'] = $country->name;
+                $country->label = $country->name;
+                $country->value = $country->code;
             }
-            $response['status'] = config('constant.messages.Success');
-            $response['message'] = "All record list";
-            $response['code'] = config('constant.codes.success');
-            $response['data'] = [$data];
-            return response($response, 200);
-//            return response()->json(
-//                [
-//                    'status' => config('constant.messages.Success'),
-//                    'message' => 'All record list',
-//                    'code' => config('constant.codes.success'),
-//                    'data' => $country,
-//                ]);
+            return response()->json(
+                [
+                    'success' => true,
+                    'status' => config('constant.messages.Success'),
+                    'message' => 'All record list',
+                    'code' => config('constant.codes.success'),
+                    'data' => $country,
+                ]);
         }else{
             return response()->json(
                 [
+                    'success' => false,
                     'status' => config('constant.messages.Failure'),
                     'message' => 'No Data found',
                     'code' => config('constant.codes.badRequest'),

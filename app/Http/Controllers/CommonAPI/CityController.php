@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Country;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -227,19 +228,13 @@ class CityController extends Controller
                 ]);
         } else {
             $cities = Country::with('city')->where('uuid',$request->uuid)->where('status','active')->get();
-//            $response['success'] = true;
-//            $data = array();
-//            foreach ($cities as $city->city){
-//                var_dump($city->city);
-//            }
-//            die();
-//            $response['status'] = config('constant.messages.Success');
-//            $response['message'] = "All record list";
-//            $response['code'] = config('constant.codes.success');
-//            $response['data'] = $data;
-//            return response($response, 200);
+            foreach ($cities->flatMap->city as $key => $city){
+                $city->label = $city->name;
+                $city->value = $city->code;
+            }
             return response()->json(
                 [
+                    'success' => true,
                     'status' => config('constant.messages.Success'),
                     'message' => 'Cities data',
                     'code' => config('constant.codes.success'),
