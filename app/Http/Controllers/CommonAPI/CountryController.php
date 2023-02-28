@@ -29,7 +29,7 @@ class CountryController extends Controller
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
-                    'data' => $country,
+                    'data' => $countries,
                 ]);
         }else{
             return response()->json(
