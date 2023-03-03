@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use App\Traits\Uuids;
+use Illuminate\Support\Benchmark;
 use Laravel\Sanctum\HasApiTokens;
 
 class Company extends Authenticatable
@@ -108,11 +109,21 @@ class Company extends Authenticatable
             set: fn ($value) => strtolower($value),
         );
     }
-    protected function status(): Attribute
+
+    protected function address(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => strtolower($value),
+            get: fn ($value) => ucfirst($value),
             set: fn ($value) => strtolower($value),
         );
     }
+
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => strtolower($value),
+            set: fn($value) => strtolower($value),
+        );
+    }
+
 }

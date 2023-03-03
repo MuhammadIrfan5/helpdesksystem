@@ -73,6 +73,10 @@ Route::prefix('company/complain')->namespace('complain')->middleware(['auth:sanc
     Route::post('assign_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'assign_complain_type_engineer'])->name('assign_complain_type');
 });
 
+Route::prefix('company_profile')->namespace('company')->middleware(['auth:sanctum','company','check_status'])->group(function () {
+    Route::post('update_company',[\App\Http\Controllers\Company\CompanyController::class,'update'])->name('update_company');
+});
+
 Route::prefix('general/listing')->namespace('listing')->middleware(['auth:sanctum'])->group(function () {
     Route::get('list_all_country',[\App\Http\Controllers\CommonAPI\CountryController::class,'index'])->name('list_all_country');
     Route::get('show_all_city',[\App\Http\Controllers\CommonAPI\CityController::class,'index'])->name('show_all_city');
@@ -82,4 +86,7 @@ Route::prefix('general/listing')->namespace('listing')->middleware(['auth:sanctu
     Route::get('show_all_roles', [\App\Http\Controllers\CommonAPI\RoleController::class, 'index'])->name('show_all');
     Route::get('show_branch_by_company', [\App\Http\Controllers\Company\BranchController::class, 'show_branch_by_company'])->name('show_branch_by_company');
     Route::get('dashborad_analytics', [\App\Http\Controllers\CommonAPI\DashboradController::class, 'dashborad_analytics'])->name('dashborad_analytics');
+});
+Route::prefix('users')->namespace('users')->middleware(['auth:sanctum'])->group(function () {
+    Route::post('change_password', [\App\Http\Controllers\API\UserController::class, 'change_password'])->name('change_password');
 });

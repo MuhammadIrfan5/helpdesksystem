@@ -5,12 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
-use Psy\Util\Str;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -126,7 +124,7 @@ class UserController extends Controller
                         $user->usertoken = $token;
                         $response['success'] = true;
                         $response['status'] = config('constant.messages.loginSuccess');
-                        $response['message'] ='Logged In';
+                        $response['message'] = 'Logged In';
                         $response['code'] = config('constant.codes.success');
                         $response['data']['uuid'] = $user->uuid;
                         $response['data']['name'] = $user->first_name . $user->last_name;
@@ -194,13 +192,70 @@ class UserController extends Controller
                 ]);
         } else {
             return response()->json(
-            [
-                'success' => false,
-                'status' => config('constant.messages.badRequest'),
-                'message' => 'Only Accepts Application json',
-                'code' => config('constant.codes.badRequest'),
-                'data' => [],
-            ]);
+                [
+                    'success' => false,
+                    'status' => config('constant.messages.badRequest'),
+                    'message' => 'Only Accepts Application json',
+                    'code' => config('constant.codes.badRequest'),
+                    'data' => [],
+                ]);
+        }
+    }
+
+    public function change_password(Request $request)
+    {
+        if ($request->accepts(['application/json'])) {
+            $validationRules = [
+                'uuid' => 'required|exists:' . get_guard_name()[1] . ',uuid',
+                'old_password' => 'required|string|current_password:' . get_guard_name()[0],
+                'password' => ['required', Password::min(10)->mixedCase()->numbers()->symbols()->uncompromised(), 'different:password_confirmation'],
+            ];
+            $messages = [
+                'old_password.current_password' => 'current password does not matched'
+            ];
+            $validator = Validator::make($request->all(), $validationRules, $messages);
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'status' => 'Validation Errors',
+                        'message' => $validator->errors()->first(),
+                        'code' => config('constant.codes.validation'),
+                        'data' => [],
+                    ]);
+
+            } else {
+                $check = get_guard_name()[2]::whereId(auth()->user()->id)->update([
+                    'password' => bcrypt($request->password)
+                ]);
+                if ($check) {
+                    return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Password Changed Successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => [],
+                    ]);
+                } else {
+                    return response()->json(
+                    [
+                        'success' => false,
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Something went wrong!',
+                        'code' => config('constant.codes.badRequest'),
+                        'data' => [],
+                    ]);
+                }
+            }
+        } else {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => config('constant.messages.badRequest'),
+                    'message' => 'Only Accepts Application json',
+                    'code' => config('constant.codes.badRequest'),
+                    'data' => [],
+                ]);
         }
     }
 

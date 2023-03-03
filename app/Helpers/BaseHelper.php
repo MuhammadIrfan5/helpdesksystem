@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 
     function checkAdminAndSupAdmin($roleName)
@@ -33,6 +34,24 @@ use Illuminate\Support\Facades\URL;
         $employee['engineer'] = \App\Models\Employee::where('company_id',$company_id)->where('role_id',4)->count();
         $employee['employee'] = \App\Models\Employee::where('company_id',$company_id)->where('role_id',5)->count();
         return $employee;
+    }
+
+    function get_guard_name(){
+        $value = array();
+        if(Auth::guard('users')->check()){
+            array_push($value,'users');
+            array_push($value,'users');
+            array_push($value,'\App\Models\User');
+        }else if(Auth::guard('company')->check()){
+            array_push($value,'company');
+            array_push($value,'companies');
+            array_push($value,'\App\Models\Company');
+        }else if(Auth::guard('employee')->check()){
+            array_push($value,'employee');
+            array_push($value,'employees');
+            array_push($value,'\App\Models\Employee');
+        }
+        return $value;
     }
 
     function imageUpload($query) // Taking input image as parameter
