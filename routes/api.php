@@ -87,6 +87,6 @@ Route::prefix('general/listing')->namespace('listing')->middleware(['auth:sanctu
     Route::get('show_branch_by_company', [\App\Http\Controllers\Company\BranchController::class, 'show_branch_by_company'])->name('show_branch_by_company');
     Route::get('dashborad_analytics', [\App\Http\Controllers\CommonAPI\DashboradController::class, 'dashborad_analytics'])->name('dashborad_analytics');
 });
-Route::prefix('users')->namespace('users')->middleware(['auth:sanctum'])->group(function () {
+Route::prefix('admin')->namespace('admin')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('change_password', [\App\Http\Controllers\API\UserController::class, 'change_password'])->name('change_password');
 });
