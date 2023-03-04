@@ -360,7 +360,7 @@ class CompanyController extends Controller
         if ($request->accepts(['application/json'])) {
             $validationRules = [
                 'uuid' => 'required|exists:companies,uuid',
-                'old_password' => 'required|string|current_password:companies',
+                'old_password' => 'required|string|current_password:company',
                 'password' => ['required', Password::min(10)->mixedCase()->numbers()->symbols()->uncompromised(), 'different:old_password'],
             ];
             $messages = [
