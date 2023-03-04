@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Country;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -350,6 +351,63 @@ class CompanyController extends Controller
                     'status' => config('constant.messages.Success'),
                     'message' => 'Company ',
                     'code' => config('constant.codes.success'),
+                    'data' => [],
+                ]);
+        }
+    }
+
+    public function change_password(Request $request){
+        if ($request->accepts(['application/json'])) {
+            $validationRules = [
+                'uuid' => 'required|exists:companies,uuid',
+                'old_password' => 'required|string|current_password:companies',
+                'password' => ['required', Password::min(10)->mixedCase()->numbers()->symbols()->uncompromised(), 'different:password_confirmation'],
+            ];
+            $messages = [
+                'old_password.current_password' => 'current password does not matched'
+            ];
+            $validator = Validator::make($request->all(), $validationRules, $messages);
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'status' => 'Validation Errors',
+                        'message' => $validator->errors()->first(),
+                        'code' => config('constant.codes.validation'),
+                        'data' => [],
+                    ]);
+
+            } else {
+                $check = DB::table('companies')
+                    ->where('id',auth()->user()->id)
+                    ->lockForUpdate()
+                    ->update(['password' => bcrypt($request->password)]);
+                if ($check) {
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'status' => config('constant.messages.Success'),
+                            'message' => 'Password Changed Successfully',
+                            'code' => config('constant.codes.success'),
+                            'data' => [],
+                        ]);
+                } else {
+                    return response()->json(
+                        [
+                            'success' => false,
+                            'status' => config('constant.messages.Failure'),
+                            'message' => 'Something went wrong!',
+                            'code' => config('constant.codes.badRequest'),
+                            'data' => [],
+                        ]);
+                }
+            }
+        } else {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => config('constant.messages.badRequest'),
+                    'message' => 'Only Accepts Application json',
+                    'code' => config('constant.codes.badRequest'),
                     'data' => [],
                 ]);
         }

@@ -62,10 +62,11 @@ Route::prefix('logout')->namespace('logout')->middleware(['auth:sanctum','check_
     Route::post('logout',[UserController::class,'allUsersLogout'])->name('logout');
 });
 
-Route::prefix('employee')->namespace('employee')->middleware(['auth:sanctum','company','check_status'])->group(function () {
+Route::prefix('employee')->namespace('employee')->middleware(['auth:sanctum','company'])->group(function () {
     Route::post('employee_create',[\App\Http\Controllers\Company\EmployeeController::class,'store'])->name('employee_create')->middleware(['limit_check']);
 });
-Route::prefix('company/complain')->namespace('complain')->middleware(['auth:sanctum','company','check_status'])->group(function () {
+
+Route::prefix('company/complain')->namespace('complain')->middleware(['auth:sanctum','company'])->group(function () {
     Route::post('complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'store'])->name('complain_type');
     Route::post('edit_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'update'])->name('edit_complain_type');
     Route::get('list_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'index'])->name('list_complain_type');
@@ -73,7 +74,7 @@ Route::prefix('company/complain')->namespace('complain')->middleware(['auth:sanc
     Route::post('assign_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'assign_complain_type_engineer'])->name('assign_complain_type');
 });
 
-Route::prefix('company_profile')->namespace('company')->middleware(['auth:sanctum','company','check_status'])->group(function () {
+Route::prefix('company_profile')->namespace('company')->middleware(['auth:sanctum','company'])->group(function () {
     Route::post('update_company',[\App\Http\Controllers\Company\CompanyController::class,'update'])->name('update_company');
 });
 
@@ -89,4 +90,13 @@ Route::prefix('general/listing')->namespace('listing')->middleware(['auth:sanctu
 });
 Route::prefix('admin')->namespace('admin')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
     Route::post('change_password', [\App\Http\Controllers\API\UserController::class, 'change_password'])->name('change_password');
+});
+Route::prefix('admin')->namespace('admin')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+    Route::post('change_password', [\App\Http\Controllers\API\UserController::class, 'change_password'])->name('change_password');
+});
+Route::prefix('company')->namespace('company')->middleware(['auth:sanctum','company'])->group(function () {
+    Route::post('change_password', [\App\Http\Controllers\Company\CompanyController::class, 'change_password'])->name('change_password');
+});
+Route::prefix('employee')->namespace('employee')->middleware(['auth:sanctum','employee'])->group(function () {
+    Route::post('change_password', [\App\Http\Controllers\Company\EmployeeController::class, 'change_password'])->name('change_password');
 });

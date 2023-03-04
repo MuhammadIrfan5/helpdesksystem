@@ -29,7 +29,7 @@ class AccountStatusMiddleware
                     [
                         'success' => false,
                         'status' => config('constant.messages.badRequest'),
-                        'message' => 'company inactivated',
+                        'message' => 'account inactivated',
                         'code' => config('constant.codes.badRequest'),
                         'data' => [],
                     ]);
