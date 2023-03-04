@@ -18,7 +18,7 @@ class EmployeeMiddleware
     public function handle(Request $request, Closure $next)
     {
         if($request->header('Authorization') && Auth::guard('employee')->check() && $request->accepts(['application/json'])){
-            if(strtolower(Auth::user()->role->status)  == 'active') {
+            if(strtolower(auth()->user()->status)  === "active") {
                 return $next($request);
             }else{
                 return response()->json(
