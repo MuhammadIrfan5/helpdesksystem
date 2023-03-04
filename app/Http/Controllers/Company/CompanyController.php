@@ -361,7 +361,7 @@ class CompanyController extends Controller
             $validationRules = [
                 'uuid' => 'required|exists:companies,uuid',
                 'old_password' => 'required|string|current_password:companies',
-                'password' => ['required', Password::min(10)->mixedCase()->numbers()->symbols()->uncompromised(), 'different:password_confirmation'],
+                'password' => ['required', Password::min(10)->mixedCase()->numbers()->symbols()->uncompromised(), 'different:old_password'],
             ];
             $messages = [
                 'old_password.current_password' => 'current password does not matched'
