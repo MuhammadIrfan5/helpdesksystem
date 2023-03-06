@@ -16,11 +16,17 @@ class ComplainType extends Model
         'type',
         'description',
         'status',
-        'created_by',
         'company_id'
     ];
 
     protected $hidden = ['id'];
+//    protected $with = [
+//        'company:id,uuid,name,email',
+//    ];
+
+    public function company(){
+        return $this->belongsTo(Company::class,'company_id');
+    }
 
     protected function status(): Attribute
     {

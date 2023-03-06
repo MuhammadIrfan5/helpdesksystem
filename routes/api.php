@@ -66,11 +66,11 @@ Route::prefix('employee')->namespace('employee')->middleware(['auth:sanctum','co
 });
 
 Route::prefix('company/complain')->namespace('complain')->middleware(['auth:sanctum','company'])->group(function () {
-    Route::post('complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'store'])->name('complain_type');
+    Route::post('create_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'store'])->name('create_complain_type');
     Route::post('edit_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'update'])->name('edit_complain_type');
-    Route::get('list_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'index'])->name('list_complain_type');
     Route::post('delete_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'destroy'])->name('delete_complain_type');
     Route::post('assign_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'assign_complain_type_engineer'])->name('assign_complain_type');
+    Route::post('list_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'list_complaintype_by_company'])->name('list_complain_type');
 });
 
 Route::prefix('company_profile')->namespace('company')->middleware(['auth:sanctum','company'])->group(function () {
@@ -85,6 +85,7 @@ Route::prefix('general/listing')->namespace('listing')->middleware(['auth:sanctu
     Route::get('show_all_packages',[\App\Http\Controllers\CommonAPI\PackageController::class,'index'])->name('show_all_packages');
     Route::get('show_all_roles', [\App\Http\Controllers\CommonAPI\RoleController::class, 'index'])->name('show_all');
     Route::get('show_branch_by_company', [\App\Http\Controllers\Company\BranchController::class, 'show_branch_by_company'])->name('show_branch_by_company');
+    Route::get('list_all_complain_type',[\App\Http\Controllers\CommonAPI\ComplainTypeController::class,'index'])->name('list_all_complain_type');
     Route::get('dashborad_analytics', [\App\Http\Controllers\CommonAPI\DashboradController::class, 'dashborad_analytics'])->name('dashborad_analytics');
 });
 Route::prefix('admin')->namespace('admin')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {

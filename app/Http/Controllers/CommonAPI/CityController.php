@@ -228,7 +228,7 @@ class CityController extends Controller
                 ]);
         } else {
             $cities = Country::with('city')->where('uuid',$request->uuid)->where('status','active')->get();
-            foreach ($cities->flatMap->city as $key => $city){
+            foreach ($cities->flatMap->city as $city){
                 $city->label = $city->name;
                 $city->value = $city->code;
             }

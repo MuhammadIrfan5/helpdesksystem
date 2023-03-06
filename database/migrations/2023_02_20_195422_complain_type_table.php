@@ -16,8 +16,6 @@ return new class extends Migration
         Schema::create('complain_type', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid');
-            $table->foreignId('created_by')->constrained('users')->onUpdate('cascade')
-                ->onDelete('cascade');
             $table->foreignId('company_id')->constrained('companies')->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->string('type');

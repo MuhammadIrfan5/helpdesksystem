@@ -87,6 +87,9 @@ class Company extends Authenticatable
     public function created_by(){
         return $this->belongsTo(User::class,'user_created_by','id');
     }
+    public function complaintype(){
+        return $this->hasMany(ComplainType::class,'company_id','id');
+    }
 
     protected function name(): Attribute
     {
