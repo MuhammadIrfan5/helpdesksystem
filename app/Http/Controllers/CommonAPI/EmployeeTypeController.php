@@ -219,26 +219,42 @@ class EmployeeTypeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($uuid)
+    public function destroy(Request $request)
     {
-        $type = EmployeeType::where('uuid',$uuid)->first();
-        if($type){
-            $type->delete();
+        $validationRules = [
+        'uuid' => 'required|exists:employee_type,uuid'
+         ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
             return response()->json(
                 [
-                    'status' => config('constant.messages.Success'),
-                    'message' => 'Record deleted successfully',
-                    'code' => config('constant.codes.success'),
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constant.codes.validation'),
                     'data' => [],
                 ]);
-        }else{
-            return response()->json(
-                [
-                    'status' => config('constant.messages.Failure'),
-                    'message' => 'Record not delete',
-                    'code' => config('constant.codes.badRequest'),
-                    'data' => [],
-                ]);
+        } else {
+            $type = EmployeeType::where('uuid', $request->uuid)->delete();
+            if ($type) {
+                return response()->json(
+                    [
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Record deleted successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => [],
+                    ]);
+            } else {
+                return response()->json(
+                    [
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Record not delete',
+                        'code' => config('constant.codes.badRequest'),
+                        'data' => [],
+                    ]);
+            }
         }
     }
+
+
 }

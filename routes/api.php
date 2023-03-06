@@ -46,12 +46,11 @@ Route::prefix('admin/role')->namespace('role')->middleware(['auth:sanctum','admi
 Route::prefix('admin/type')->namespace('employeetype')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
 //    EMPLOYEE TYPE ROUTES
     Route::post('create_type',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'store'])->name('create_type');
-
     Route::delete('delete_type/{uuid}',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'destroy'])->name('delete_type');
     Route::post('update_type',[\App\Http\Controllers\CommonAPI\EmployeeTypeController::class,'update'])->name('update_type');
 });
 
-Route::prefix('admin/packages')->namespace('employeetype')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
+Route::prefix('admin/packages')->namespace('packages')->middleware(['auth:sanctum','adminSuperAdmin:super-admin,admin'])->group(function () {
 //    PACKAGES ROUTES
     Route::post('create_package',[\App\Http\Controllers\CommonAPI\PackageController::class,'store'])->name('create_package');
     Route::post('update_package',[\App\Http\Controllers\CommonAPI\PackageController::class,'update'])->name('update_package');

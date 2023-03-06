@@ -75,7 +75,7 @@ class PackageController extends Controller
                     'success' => false,
                     'status' => 'Validation Errors',
                     'message' => $validator->errors()->first(),
-                    'code' => config('constants.codes.validation'),
+                    'code' => config('constant.codes.validation'),
                     'data' => [],
                 ]);
         } else {
@@ -153,7 +153,7 @@ class PackageController extends Controller
                     'success' => false,
                     'status' => 'Validation Errors',
                     'message' => $validator->errors()->first(),
-                    'code' => config('constants.codes.validation'),
+                    'code' => config('constant.codes.validation'),
                     'data' => [],
                 ]);
         } else {
@@ -202,7 +202,7 @@ class PackageController extends Controller
                     'success' => false,
                     'status' => 'Validation Errors',
                     'message' => $validator->errors()->first(),
-                    'code' => config('constants.codes.validation'),
+                    'code' => config('constant.codes.validation'),
                     'data' => [],
                 ]);
         } else {
