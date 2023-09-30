@@ -28,5 +28,4 @@ class CompanyComplainType extends Model
         'employee_role_id' => 'string',
     ];
 
-
 }

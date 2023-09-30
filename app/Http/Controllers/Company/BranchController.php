@@ -18,7 +18,7 @@ class BranchController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function show_branch_by_company(Request $request)
+    public function show_branch_by_company()
     {
         try {
             if(Auth::guard('company')->check()){
@@ -27,6 +27,10 @@ class BranchController extends Controller
                 $branches = CompanyBranch::where('status','active')->paginate(5);
             }
             if ($branches) {
+                foreach ($branches  as $branch){
+                    $branch->label = $branch->branch_name;
+                    $branch->value = $branch->uuid;
+                }
                 return response()->json(
                     [
                         'status' => config('constant.messages.Success'),

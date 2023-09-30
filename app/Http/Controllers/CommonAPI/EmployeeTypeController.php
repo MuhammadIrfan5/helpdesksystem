@@ -17,15 +17,19 @@ class EmployeeTypeController extends Controller
      */
     public function index()
     {
-        $type = EmployeeType::all();
-        if(!empty($type)) {
+        $types = EmployeeType::all();
+        foreach ($types as $type){
+            $type->value = $type->uuid;
+            $type->label = $type->type;
+        }
+        if(!empty($types)) {
             return response()->json(
                 [
                     'success' => true,
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
-                    'data' => $type,
+                    'data' => $types,
                 ]);
         }else{
             return response()->json(
@@ -101,7 +105,6 @@ class EmployeeTypeController extends Controller
                         ]);
                 }
             }catch (\Exception $e){
-                dd('here');
                 return response()->json(
                     [
                         'success' => false,

@@ -19,17 +19,21 @@ class RoleController extends Controller
     public function index()
     {
         if(Auth::guard('users')->check()){
-            $role = Role::where('status','active')->get();
+            $roles = Role::where('status','active')->get();
         }elseif (Auth::guard('company')->check()){
-            $role = Role::where('status','active')->whereNotIn('slug',['admin','super-admin','company'])->get();
+            $roles = Role::where('status','active')->whereNotIn('slug',['admin','super-admin','company'])->get();
         }
-        if(!empty($role)) {
+        if(!empty($roles)) {
+            foreach ($roles as $role){
+                $role->label = $role->name;
+                $role->value = $role->uuid;
+            }
             return response()->json(
                 [
                     'status' => config('constant.messages.Success'),
                     'message' => 'All record list',
                     'code' => config('constant.codes.success'),
-                    'data' => $role,
+                    'data' => $roles,
                 ]);
         }else{
             return response()->json(

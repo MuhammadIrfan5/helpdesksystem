@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use function PHPUnit\Framework\isEmpty;
 
 class ComplainTypeController extends Controller
 {
@@ -21,8 +22,8 @@ class ComplainTypeController extends Controller
      */
     public function index()
     {
-        $complain_type = ComplainType::where('status','active')->get();
-        foreach ($complain_type as $type){
+        $complain_type = ComplainType::paginate(10);
+        foreach ($complain_type as $type) {
             $type->company_id = $type->company->name;
         }
         return response()->json(
@@ -35,7 +36,9 @@ class ComplainTypeController extends Controller
             ]);
     }
 
-    public function list_complaintype_by_company(Request $request){
+
+    public function list_complaintype_by_company(Request $request)
+    {
         $validationRules = [
             'uuid' => 'required|uuid|exists:companies,uuid'
         ];
@@ -50,11 +53,13 @@ class ComplainTypeController extends Controller
                     'data' => [],
                 ]);
         } else {
-            $types = Company::with('complaintype')->where('uuid',$request->uuid)->where('status','active')->get();
-            foreach ($types->flatMap->complaintype as $key => $type){
-                $type->label = $type->type;
-                $type->value = $type->uuid;
-                $type->company_id = $type->company->name;
+            $types = Company::with('complaintype')->where('uuid', $request->uuid)->first();
+            foreach ($types->complaintype as $type) {
+                $typed[] = [
+                    'label' => $type->type,
+                    'value' => $type->uuid,
+                    'companyName' => $type->company->name,
+                ];
             }
             return response()->json(
                 [
@@ -62,8 +67,48 @@ class ComplainTypeController extends Controller
                     'status' => config('constant.messages.Success'),
                     'message' => 'Complain type fetch successfully',
                     'code' => config('constant.codes.success'),
-                    'data' => $types->flatMap->complaintype,
+                    'data' => $typed,
                 ]);
+        }
+    }
+
+    public function block_complain_type(Request $request)
+    {
+        $validationRules = [
+            'uuid' => 'required|uuid|exists:complain_type,uuid',
+            'status' => 'required'
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constant.codes.validation'),
+                    'data' => [],
+                ]);
+        } else {
+            $type = ComplainType::where('uuid', $request->uuid)->update(['status' => $request->status]);
+            if ($type) {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Complain type status changed successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => $type,
+                    ]);
+            } else {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Something went wrong',
+                        'code' => config('constant.codes.internalServer'),
+                        'data' => [],
+                    ]);
+            }
         }
     }
 
@@ -80,7 +125,7 @@ class ComplainTypeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -89,6 +134,7 @@ class ComplainTypeController extends Controller
             'type' => 'required',
             'description' => 'nullable',
             'status' => 'required',
+            'uuid' => 'required|uuid|exists:companies,uuid'
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -105,10 +151,10 @@ class ComplainTypeController extends Controller
                 'uuid' => Str::uuid(),
                 'type' => $request->type,
                 'description' => $request->description,
-                'company_id' => auth()->user()->id,
+                'company_id' => Company::where('uuid', $request->uuid)->first()['id'],
                 'status' => $request->status
             ]);
-            if($complain_type) {
+            if ($complain_type) {
                 return response()->json(
                     [
                         'success' => true,
@@ -117,7 +163,7 @@ class ComplainTypeController extends Controller
                         'code' => config('constant.codes.success'),
                         'data' => $complain_type,
                     ]);
-            }else{
+            } else {
                 return response()->json(
                     [
                         'success' => true,
@@ -130,10 +176,11 @@ class ComplainTypeController extends Controller
         }
     }
 
+
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -144,7 +191,7 @@ class ComplainTypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -155,14 +202,15 @@ class ComplainTypeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
     {
         $validationRules = [
             'uuid' => 'required|uuid|exists:complain_type,uuid',
+            'company_uuid' => 'required|uuid|exists:companies,uuid',
             'type' => 'required',
             'description' => 'nullable',
             'status' => 'required',
@@ -179,12 +227,11 @@ class ComplainTypeController extends Controller
                 ]);
         } else {
 
-            $complain_type = ComplainType::where('uuid',$request->uuid)->where('company_id',auth()->user()->id)->first();
-            if($complain_type) {
-                $complain_type->uuid = auth()->user()->uuid;
+            $company_id = Company::where('uuid', $request->company_uuid)->first()['id'];
+            $complain_type = ComplainType::where('uuid', $request->uuid)->where('company_id', $company_id)->first();
+            if ($complain_type) {
                 $complain_type->type = $request->type ?? $complain_type->type;
                 $complain_type->description = $request->description ?? $complain_type->description;
-                $complain_type->company_id = auth()->user()->id;
                 $complain_type->status = $request->status ?? $complain_type->status;
                 $complain_type->update();
                 return response()->json(
@@ -195,7 +242,7 @@ class ComplainTypeController extends Controller
                         'code' => config('constant.codes.success'),
                         'data' => $complain_type,
                     ]);
-            }else{
+            } else {
                 return response()->json(
                     [
                         'success' => true,
@@ -211,13 +258,14 @@ class ComplainTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
     {
         $validationRules = [
             'uuid' => 'required|uuid|exists:complain_type,uuid',
+            'company_uuid' => 'required|uuid|exists:companies,uuid',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -230,13 +278,13 @@ class ComplainTypeController extends Controller
                     'data' => [],
                 ]);
         } else {
-            $complain_type = ComplainType::where('uuid',$request->uuid)->where('company_id',auth()->user()->id)->delete();
-            if($complain_type) {
+            $complain_type = ComplainType::where('uuid', $request->uuid)->where('company_id', $request->company_uuid)->delete();
+            if ($complain_type) {
                 return response()->json(
                     [
                         'success' => true,
                         'status' => config('constant.messages.Success'),
-                        'message' => 'Complain delete successfully',
+                        'message' => 'Complain Type delete successfully',
                         'code' => config('constant.codes.success'),
                         'data' => [],
                     ]);
@@ -253,12 +301,12 @@ class ComplainTypeController extends Controller
         }
     }
 
-    public function assign_complain_type_engineer(Request $request){
+    public function assign_complain_type_engineer(Request $request)
+    {
         $validationRules = [
-            'complain_type_uuid' => 'required|uuid|exists:complain_type,uuid',
             'company_uuid' => 'required|uuid|exists:companies,uuid',
             'employee_uuid' => 'required|uuid|exists:employee,uuid',
-            'employee_uuid' => Rule::prohibitedIf(fn () => Employee::with('role')->where('uuid',$request->employee_uuid)->first()->role->slug != 'engineer'),
+            'complain_uuid' => 'required|string',
         ];
         $validator = Validator::make($request->all(), $validationRules);
         if ($validator->fails()) {
@@ -271,35 +319,76 @@ class ComplainTypeController extends Controller
                     'data' => [],
                 ]);
         } else {
-            $complain_type = ComplainType::where('uuid',$request->complain_type_uuid)->first();
-            $company = Company::where('uuid',$request->company_uuid)->first();
-            $engineer = Employee::with('role')->where('uuid',$request->employee_uuid)->first();
-
-            $assign = CompanyComplainType::create(
+            $complaintype_uuids = explode(',', $request->complain_uuid);
+            foreach ($complaintype_uuids as $uuid) {
+                $type = ComplainType::where('uuid', $uuid)->first();
+                if ($type != null) {
+                    $company_complain_type = new CompanyComplainType();
+                    $company_complain_type->uuid = Str::uuid();
+                    $company_complain_type->company_id = Company::where('uuid', $request->company_uuid)->first()['id'];
+                    $company_complain_type->complain_type_id = $type->id;
+                    $company_complain_type->employee_id = Employee::where('uuid', $request->employee_uuid)->first()['id'];
+                    $company_complain_type->employee_role_id = Employee::where('uuid', $request->employee_uuid)->first()['role_id'];
+                    $company_complain_type->save();
+                }
+            }
+            return response()->json(
                 [
-                    'uuid' => Str::uuid(),
-                    'company_id' => $company->id,
-                    'complain_type_id' => $complain_type->id,
-                    'employee_id' => $engineer->id,
-                    'employee_role_id' => $engineer->role->id
-                ]
-            );
-            if($assign) {
+                    'success' => true,
+                    'status' => config('constant.messages.Success'),
+                    'message' => 'Complaint Type Assign Successfully',
+                    'code' => config('constant.codes.success'),
+                    'data' => [],
+                ]);
+        }
+    }
+
+
+    public function engineer_unassign_complain_type(Request $request){
+        $validationRules = [
+            'company_uuid' => 'required|uuid|exists:companies,uuid',
+            'employee_uuid' => 'required|uuid|exists:employee,uuid'
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constant.codes.validation'),
+                    'data' => [],
+                ]);
+        } else {
+            $company = Company::where('uuid',$request->company_uuid)->first();
+            $employee = Employee::where('uuid',$request->employee_uuid)->first();
+            $company_complain_type = CompanyComplainType::where('company_id',$company->id)->where('employee_id',$employee->id)->get();
+            $type_uuids = array();
+            foreach ($company_complain_type as $type){
+                array_push($type_uuids,$type->complain_type_id);
+            }
+            $complain_types = ComplainType::where('company_id',$company->id)->whereNotIn('id',$type_uuids)->get();
+            if(count($complain_types) > 0) {
+                $response = array();
+                foreach ($complain_types as $key => $type) {
+                    $response[$key]['value'] = $type->uuid;
+                    $response[$key]['label'] = $type->type;
+                }
                 return response()->json(
                     [
                         'success' => true,
                         'status' => config('constant.messages.Success'),
-                        'message' => 'Complaint Type Assign Successfully',
+                        'message' => 'Complaint Types List',
                         'code' => config('constant.codes.success'),
-                        'data' => [],
+                        'data' => $response,
                     ]);
-            } else {
+            }else{
                 return response()->json(
                     [
-                        'success' => false,
-                        'status' => config('constant.messages.Failure'),
-                        'message' => 'Something went wrong!',
-                        'code' => config('constant.codes.internalServer'),
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Complaint types already assigned',
+                        'code' => config('constant.codes.success'),
                         'data' => [],
                     ]);
             }
@@ -307,3 +396,6 @@ class ComplainTypeController extends Controller
     }
 
 }
+
+
+//e03fd285-5392-4983-b880-4d4c3a08096e,29b1515a-3b69-4176-86bb-181c105f5eb8

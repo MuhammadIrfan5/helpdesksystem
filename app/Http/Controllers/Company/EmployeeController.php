@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Models\City;
+use App\Models\Company;
+use App\Models\CompanyBranch;
+use App\Models\Country;
 use App\Models\Employee;
+use App\Models\EmployeeType;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -146,16 +152,16 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $validationRules = [
-//            'company_id' => 'required|string',
-            'branch_id' => 'required|string',
-            'country_id' => 'required|string',
-            'city_id' => 'required|string',
-            'role_id' => 'required|string',
+            'company_id' => 'required|uuid|exists:companies,uuid',
+            'branch_id' => 'required|uuid|exists:employee,uuid',
+            'country_id' => 'required|uuid|exists:countries,uuid',
+            'city_id' => 'required|uuid|exists:cities,uuid',
+            'role_id' => 'required|uuid|exists:roles,uuid',
             'employee_code' => 'required|string|unique:employee,employee_code',
-            'employee_type_id' => 'required|string',
+            'employee_type_id' => 'required|uuid|exists:employee_type,uuid',
             'first_name' => 'required|string',
             'company_email' => 'required|email|unique:employee,company_email',
-            'primary_phone_no' => 'required|string|min:11|max:12',
+            'primary_phone_no' => 'required|unique:employee,primary_phone_no|min:11|max:12',
             'status' => 'required',
         ];
         $validator = Validator::make($request->all(), $validationRules);
@@ -169,15 +175,16 @@ class EmployeeController extends Controller
                     'data' => [],
                 ]);
         } else {
+
             $data = [
                 'uuid' => Str::uuid(),
-                'company_id' => auth()->user()->id,
-                'branch_id' => $request->branch_id ,
-                'country_id' => $request->country_id,
-                'city_id' => $request->city_id,
-                'role_id' => $request->role_id,
+                'company_id' => Company::where('uuid',$request->company_id)->first()['id'],
+                'branch_id' => CompanyBranch::where('uuid',$request->branch_id)->first()['id'],
+                'country_id' => Country::where('uuid',$request->country_id)->first()['id'],
+                'city_id' => City::where('uuid',$request->city_id)->first()['id'],
+                'role_id' => Role::where('uuid',$request->role_id)->first()['id'],
                 'employee_code' => $request->employee_code,
-                'employee_type_id' => $request->employee_type_id,
+                'employee_type_id' => EmployeeType::where('uuid',$request->employee_type_id)->first()['id'],
                 'first_name' => $request->first_name,
                 'company_email' => $request->company_email,
                 'primary_phone_no' => $request->primary_phone_no,
@@ -261,6 +268,50 @@ class EmployeeController extends Controller
                     'code' => config('constant.codes.badRequest'),
                     'data' => [],
                 ]);
+        }
+    }
+
+    public function list_engineers_by_company(Request $request){
+        if ($request->accepts(['application/json'])) {
+            $validationRules = [
+                'company_uuid' => 'required|uuid|exists:companies,uuid',
+            ];
+            $validator = Validator::make($request->all(), $validationRules);
+            if ($validator->fails()) {
+                return response()->json(
+                    [
+                        'status' => 'Validation Errors',
+                        'message' => $validator->errors()->first(),
+                        'code' => config('constant.codes.validation'),
+                        'data' => [],
+                    ]);
+
+            } else {
+
+                $engineers = Employee::where('role_id',4)->get();
+                $response = array();
+                foreach ($engineers as $key => $engineer){
+                    $response[$key]['value'] = $engineer->uuid;
+                    $response[$key]['label'] = $engineer->first_name ." ".$engineer->last_name;
+                }
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Engineer List Successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => $response,
+                    ]);
+            }
+        }else{
+            return response()->json(
+            [
+                'success' => false,
+                'status' => config('constant.messages.badRequest'),
+                'message' => 'Only Accepts Application json',
+                'code' => config('constant.codes.badRequest'),
+                'data' => [],
+            ]);
         }
     }
 

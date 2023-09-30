@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\CommonAPI;
 
 use App\Http\Controllers\Controller;
-use App\Models\ComplainType;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -18,7 +17,7 @@ class PackageController extends Controller
      */
     public function index()
     {
-        $packages = Package::where('status','active')->get();
+        $packages = Package::all();
         if(!$packages->isEmpty()){
             foreach ($packages as $package){
                 $package->label = $package->name;
@@ -137,10 +136,10 @@ class PackageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $validationRules = [
-            'uuid' => 'required|exists:packages,uuid',
+            'uuid' => 'required|uuid|exists:packages,uuid',
             'name' => 'required',
             'slug' => 'required',
             'status' => 'required',
@@ -207,6 +206,45 @@ class PackageController extends Controller
                 ]);
         } else {
             $package = Package::where('uuid',$request->uuid)->delete();
+            if($package) {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'status' => config('constant.messages.Success'),
+                        'message' => 'Data Updated Successfully',
+                        'code' => config('constant.codes.success'),
+                        'data' => [],
+                    ]);
+            } else {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'status' => config('constant.messages.Failure'),
+                        'message' => 'Something went wrong!',
+                        'code' => config('constant.codes.internalServer'),
+                        'data' => [],
+                    ]);
+            }
+        }
+    }
+
+    public function block_package(Request $request){
+        $validationRules = [
+            'uuid' => 'required|exists:packages,uuid',
+            'status' => 'required'
+        ];
+        $validator = Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'status' => 'Validation Errors',
+                    'message' => $validator->errors()->first(),
+                    'code' => config('constant.codes.validation'),
+                    'data' => [],
+                ]);
+        } else {
+            $package = Package::where('uuid',$request->uuid)->update(['status',$request->status]);
             if($package) {
                 return response()->json(
                     [
